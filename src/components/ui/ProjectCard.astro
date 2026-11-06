@@ -1,0 +1,115 @@
+---
+import type { Project } from '@/data/projects';
+import { pick, type Locale } from '@/i18n/ui';
+import Boat from './Boat.astro';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+  demoLabel: string;
+  index: number;
+}
+const { project, locale, demoLabel, index } = Astro.props;
+const tech = Array.isArray(project.tech) ? project.tech : pick(project.tech, locale);
+---
+
+<article class:list={['project', { 'project--featured': project.featured }]} style={`--i: ${index}`} data-reveal>
+  <header class="project__head">
+    <Boat lit={project.featured} />
+    <div>
+      <h3 class="project__name">
+        <a href={project.url} target="_blank" rel="noopener">{project.name}</a>
+      </h3>
+      <p class="project__repo">{project.repos.join(' + ')}</p>
+    </div>
+  </header>
+  <p class="project__desc">{pick(project.description, locale)}</p>
+  <p class="project__tech">
+    {tech.join(' · ')}
+    {
+      project.demo && (
+        <>
+          {'  ·  '}
+          <a href={project.demo} target="_blank" rel="noopener">
+            ↗ {demoLabel}
+          </a>
+        </>
+      )
+    }
+  </p>
+</article>
+
+<style>
+  .project {
+    position: relative;
+    display: grid;
+    gap: var(--space-xs);
+    padding: var(--space-m) var(--space-l);
+    border: 1px solid var(--nevoa-linha);
+    border-radius: var(--radius-card);
+    background: var(--painel);
+    transition:
+      border-color var(--dur-base),
+      box-shadow var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  .project--featured {
+    border-color: var(--luz);
+    background: var(--painel-forte);
+  }
+  .project:focus-within {
+    border-color: var(--luz);
+  }
+  .project__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+  }
+  .project__name {
+    margin: 0;
+    font-size: 1.375rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .project__name a {
+    text-decoration: none;
+  }
+  /* o card inteiro é clicável sem aninhar links */
+  .project__name a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .project__name a:focus-visible {
+    outline: none;
+  }
+  .project__repo,
+  .project__tech {
+    margin: 0;
+    font: 400 var(--text-label) / 1.5 var(--font-mono);
+    color: var(--nevoa);
+  }
+  .project__desc {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: 1.5;
+    color: color-mix(in oklch, var(--farol-creme) 85%, transparent);
+  }
+  .project__tech {
+    color: var(--luz);
+    letter-spacing: 0.02em;
+  }
+  .project__tech a {
+    position: relative;
+    z-index: 1;
+  }
+  @media (--hover) {
+    .project:hover {
+      border-color: var(--luz-media);
+      box-shadow: 0 0 32px color-mix(in oklch, var(--luz) 12%, transparent);
+      transform: translateY(-2px);
+    }
+  }
+</style>
