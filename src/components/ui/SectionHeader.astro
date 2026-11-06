@@ -1,0 +1,26 @@
+---
+import { sectionIndex, type SectionId } from '@/data/sections';
+
+interface Props {
+  section: SectionId;
+  title: string;
+  description: string;
+  /** Ponto final aceso, como a lâmpada (padrão: sim). */
+  dot?: boolean;
+}
+const { section, title, description, dot = true } = Astro.props;
+---
+
+<header class="section-header" data-reveal>
+  <p class="eyebrow">{sectionIndex(section)}</p>
+  <h2 class="title">{title}{dot && <span class="dot">.</span>}</h2>
+  <p class="lead">{description}</p>
+</header>
+
+<style>
+  .section-header {
+    display: grid;
+    gap: var(--space-m);
+    max-width: 35rem;
+  }
+</style>

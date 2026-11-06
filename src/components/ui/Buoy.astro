@@ -1,0 +1,82 @@
+---
+interface Props {
+  label: string;
+  index: number;
+}
+const { label, index } = Astro.props;
+---
+
+<li class="buoy" style={`--i: ${index}`} data-reveal>
+  <svg class="buoy__shape" viewBox="0 0 34 46" aria-hidden="true">
+    <ellipse cx="17" cy="41" rx="17" ry="3" fill="#8c98c4" opacity="0.25"></ellipse>
+    <rect x="16" y="6" width="2" height="8" fill="#efe6d2"></rect>
+    <path d="M6 40 V24 A11 11 0 0 1 28 24 V40 Z" fill="#c9463d"></path>
+    <path d="M6 24 h22 v4 h-22 z" fill="#efe6d2"></path>
+    <circle class="buoy__light" cx="17" cy="4" r="4" fill="#ffe3a1"></circle>
+  </svg>
+  <span class="buoy__label">{label}</span>
+</li>
+
+<style>
+  .buoy {
+    --buoy-size: 2.125rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    list-style: none;
+  }
+  .buoy__shape {
+    width: var(--buoy-size);
+    aspect-ratio: 34 / 46;
+    overflow: visible;
+    transform-origin: 50% 90%;
+    animation: balancar 3.6s var(--ease-in-out) infinite;
+    animation-delay: calc(var(--i) * -0.7s);
+  }
+  .buoy__light {
+    filter: drop-shadow(0 0 6px var(--luz));
+    animation: lampejo 4s steps(1) infinite;
+    animation-delay: calc(var(--i) * -0.37s);
+  }
+  .buoy__label {
+    padding: var(--space-xs) var(--space-m);
+    border: 1px solid var(--luz-media);
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklch, var(--noite) 80%, var(--luz));
+    color: var(--luz);
+    font: 500 var(--text-small) var(--font-mono);
+    white-space: nowrap;
+    box-shadow: 0 0 18px color-mix(in oklch, var(--luz) 8%, transparent);
+    transition:
+      box-shadow var(--dur-base) var(--ease-out),
+      border-color var(--dur-base),
+      transform var(--dur-base) var(--ease-out);
+  }
+  @media (--hover) {
+    .buoy:hover .buoy__label {
+      border-color: var(--luz);
+      box-shadow: 0 0 26px var(--luz-halo);
+      transform: translateY(-2px);
+    }
+  }
+  @keyframes balancar {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-3deg);
+    }
+    50% {
+      transform: translateY(3px) rotate(3deg);
+    }
+  }
+  /* característica de boia: lampejo curto, longo período escuro */
+  @keyframes lampejo {
+    0%,
+    10% {
+      opacity: 1;
+    }
+    11%,
+    100% {
+      opacity: 0.25;
+    }
+  }
+</style>
