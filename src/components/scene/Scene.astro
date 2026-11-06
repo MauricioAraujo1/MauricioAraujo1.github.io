@@ -1,0 +1,24 @@
+---
+/**
+ * Cena do farol, fixa atrás do conteúdo.
+ * O SVG vem do VectorCraft com um id por camada; aqui só ganha as camadas
+ * extras do site. Toda a animação fica em styles/scene.css + scripts/.
+ */
+import sceneSvg from '@/assets/scene/farol-cena.svg?raw';
+import { airplane, clouds, easterEgg, leftSky, shootingStar } from './overlays';
+import '@/styles/scene.css';
+
+const svg = sceneSvg
+  .replace(/<\?xml[^>]*>\s*/, '')
+  .replace(
+    /<svg ([^>]*?)width="1440" height="900"/,
+    // "meet" + largura mínima de 160vh (ver scene.css): ajusta pela altura, alinhado à direita.
+    '<svg $1class="scene__svg" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false"',
+  )
+  .replace('<g id="montanhas"', `${leftSky}${clouds}${airplane}${shootingStar}<g id="montanhas"`)
+  .replace(/<\/svg>\s*$/, `${easterEgg}</svg>`);
+---
+
+<div class="scene" data-scene>
+  <Fragment set:html={svg} />
+</div>
