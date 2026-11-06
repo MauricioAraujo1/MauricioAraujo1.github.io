@@ -1,0 +1,67 @@
+---
+import { bearingOf } from '@/data/sections';
+import { journey } from '@/data/journey';
+import { useTranslations, type Locale } from '@/i18n/ui';
+import Port from '@/components/ui/Port.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section id="journey" class="section section--tall" data-section="journey" data-bearing={bearingOf('journey')}>
+  <SectionHeader section="journey" title={t.journey.title} description={t.journey.description} />
+  <ol class="ports">
+    {journey.map((port, i) => <Port port={port} locale={locale} labels={t.journey} index={i} />)}
+  </ol>
+</section>
+
+<style>
+  .ports {
+    position: relative;
+    display: grid;
+    max-width: min(52rem, var(--clear-of-lighthouse));
+    margin: 0;
+    padding: 0;
+  }
+  /* No fluxo (celular) a cena fixa passa atrás do texto longo: painel para leitura. */
+  .ports {
+    padding: var(--space-m) var(--space-m) var(--space-m) var(--space-s);
+    border-radius: var(--radius-card);
+    background: color-mix(in oklch, var(--noite-funda) 82%, transparent);
+    backdrop-filter: blur(3px);
+  }
+  .ports::before {
+    left: calc(var(--space-s) + 5px);
+    inset-block: calc(var(--space-m) + 0.625rem);
+  }
+  @media (--stage) {
+    .ports {
+      padding: 0;
+      background: none;
+      backdrop-filter: none;
+    }
+    .ports::before {
+      left: 5px;
+      inset-block: 0.625rem;
+    }
+  }
+  /* separador fino entre portos, como linhas de um diário de bordo */
+  .ports > :global(li + li) {
+    padding-top: var(--space-s);
+    margin-top: var(--space-s);
+    border-top: 1px solid color-mix(in oklch, var(--nevoa) 12%, transparent);
+  }
+  /* rota que liga os portos */
+  .ports::before {
+    content: '';
+    position: absolute;
+    inset-block: 0.625rem;
+    left: 5px;
+    width: 2px;
+    background: linear-gradient(var(--luz-media), color-mix(in oklch, var(--luz) 10%, transparent));
+  }
+</style>
