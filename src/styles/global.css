@@ -1,0 +1,288 @@
+@import './tokens.css';
+
+/* =========================================================
+   Layout derivado da cena (variáveis --scene-* vêm de geometry.ts)
+   ========================================================= */
+:root {
+  /* px por unidade do viewBox. Fluxo: escala fixa; stage: cena cabe na altura. */
+  --scene-u: calc(var(--scene-flow-scale) * 1px);
+  --flow-lantern-inset: 3.75rem; /* distância da lanterna à borda direita no celular */
+}
+@media (--stage) {
+  :root {
+    --scene-u: calc(100svh / var(--scene-h));
+  }
+}
+:root {
+  --horizon: calc(var(--scene-horizon) * var(--scene-u));
+  --tower-offset: calc((var(--scene-w) - var(--scene-tower-left)) * var(--scene-u));
+  /* largura livre à esquerda da torre */
+  --clear-of-lighthouse: 100%;
+}
+@media (--stage) {
+  :root {
+    --clear-of-lighthouse: calc(100vw - var(--tower-offset) - var(--gutter) - var(--space-l));
+  }
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--noite-funda);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  color: var(--farol-creme);
+  background: var(--noite-funda);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+a {
+  color: inherit;
+}
+
+/*
+ * Barra de rolagem no estilo do Scroll Area (shadcn/Radix): fina, arredondada,
+ * sem setas e sem trilho. Estilizamos a nativa para manter scroll snap,
+ * âncoras e rolagem por toque/teclado.
+ */
+html {
+  --scrollbar-thumb: color-mix(in oklch, var(--nevoa) 35%, transparent);
+  --scrollbar-thumb-hover: color-mix(in oklch, var(--nevoa) 60%, transparent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-button {
+  display: none;
+}
+::-webkit-scrollbar-thumb {
+  /* borda transparente + background-clip = polegar fino com respiro, como no Radix */
+  border: 3px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--scrollbar-thumb) padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--luz);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  top: var(--space-s);
+  left: var(--space-s);
+  z-index: var(--z-skip);
+  padding: var(--space-xs) var(--space-m);
+  background: var(--luz);
+  color: var(--noite);
+  border-radius: var(--radius-pill);
+  font: 500 var(--text-small) var(--font-sans);
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: none;
+}
+
+/* =========================================================
+   Seções
+   Fluxo (base): rolagem normal. Stage: um passo de tela cheia por seção.
+   pointer-events: none no fundo deixa a lua clicável (easter egg).
+   ========================================================= */
+main {
+  position: relative;
+  z-index: var(--z-content);
+}
+
+.section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+  padding: calc(var(--space-2xl) + var(--space-xl)) max(var(--space-l), env(safe-area-inset-left)) var(--space-2xl);
+  pointer-events: none;
+  /* a cena fica fixa atrás: a sombra mantém o texto legível sobre ela */
+  text-shadow: 0 1px 14px var(--sombra-texto);
+}
+.section > * {
+  pointer-events: auto;
+  max-width: var(--content-max);
+}
+.section:last-of-type {
+  /* espaço para o farol, que no fluxo fica ancorado no fim da tela */
+  padding-bottom: calc((var(--scene-h) - var(--scene-tower-top)) * var(--scene-u) + var(--space-xl));
+}
+
+@media (--stage) {
+  html {
+    scroll-snap-type: y mandatory;
+  }
+  .section,
+  .section:last-of-type {
+    justify-content: center;
+    gap: var(--space-xl);
+    height: 100svh;
+    padding: 7.5rem var(--gutter) 6rem;
+    overflow: hidden;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    text-shadow: none;
+  }
+  /* seção que pode passar da altura da tela (ex.: trajetória com detalhes abertos):
+     continua encaixando no topo, mas rola por dentro do passo */
+  .section.section--tall {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+    justify-content: flex-start;
+  }
+}
+
+/* =========================================================
+   Tipografia compartilhada
+   ========================================================= */
+.eyebrow {
+  margin: 0;
+  font: 500 0.75rem/1 var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--luz);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-title);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+}
+.title .dot {
+  color: var(--luz);
+}
+
+.lead {
+  margin: 0;
+  max-width: 34ch;
+  font-size: var(--text-body);
+  line-height: 1.5;
+  color: var(--nevoa);
+}
+
+.mono-label {
+  font: 400 var(--text-label) / 1.3 var(--font-mono);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--nevoa);
+}
+
+/* =========================================================
+   Botões (hierarquia: sólido = ação principal, ghost = secundária)
+   ========================================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s);
+  min-height: 2.75rem; /* alvo de toque */
+  padding: var(--space-m) var(--space-l);
+  border: 1px solid var(--luz);
+  border-radius: var(--radius-pill);
+  font: 500 0.9375rem var(--font-sans);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    background-color var(--dur-fast);
+}
+.btn--solid {
+  background: var(--luz);
+  color: var(--noite);
+  box-shadow: 0 0 28px var(--luz-halo);
+}
+.btn--ghost {
+  min-height: 2.5rem;
+  padding: var(--space-xs) var(--space-m);
+  background: var(--luz-sutil);
+  color: var(--luz);
+  font: 500 var(--text-mono) var(--font-mono);
+}
+.btn:active {
+  transform: scale(0.98);
+}
+@media (--hover) {
+  .btn--solid:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px var(--luz-media);
+  }
+  .btn--ghost:hover {
+    background: color-mix(in oklch, var(--luz) 20%, transparent);
+  }
+}
+
+/* =========================================================
+   Revelar ao rolar (scripts/ui.ts adiciona .is-visible)
+   ========================================================= */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(var(--space-m));
+  transition:
+    opacity var(--dur-entrance) var(--ease-out),
+    transform var(--dur-entrance) var(--ease-out);
+  transition-delay: calc(min(var(--i, 0), 8) * var(--stagger));
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (--reduced-motion) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}

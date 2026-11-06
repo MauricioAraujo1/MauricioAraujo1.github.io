@@ -1,0 +1,71 @@
+/* Design tokens (fonte: design/farol-portfolio.figcraft). */
+:root {
+  /* ---------- Cor ---------- */
+  --noite: #0e1430;
+  --noite-funda: #080c22;
+  --horizonte: #1e2a5a;
+  --rocha: #18203f;
+  --farol-vermelho: #c9463d;
+  --farol-creme: #efe6d2;
+  --luz: #ffe3a1; /* única cor quente forte */
+  --nevoa: #8c98c4;
+  --ovni-agua: #8ff5e0; /* só no easter egg */
+  --ovni-lilas: #9d7bff;
+
+  /* Variações derivadas, em vez de rgba() soltos */
+  --luz-sutil: color-mix(in oklch, var(--luz) 12%, transparent);
+  --luz-media: color-mix(in oklch, var(--luz) 55%, transparent);
+  --luz-halo: color-mix(in oklch, var(--luz) 45%, transparent);
+  --nevoa-linha: color-mix(in oklch, var(--nevoa) 25%, transparent);
+  --painel: color-mix(in oklch, var(--noite) 90%, transparent);
+  --painel-forte: color-mix(in oklch, var(--noite) 96%, var(--horizonte));
+  --sombra-texto: color-mix(in oklch, var(--noite-funda) 95%, transparent);
+
+  /* ---------- Tipografia (escala fluida) ---------- */
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+
+  --text-label: 0.6875rem; /* 11px */
+  --text-mono: 0.8125rem; /* 13px */
+  --text-small: 0.875rem; /* 14px */
+  --text-body: clamp(0.9375rem, 0.85rem + 0.35vw, 1.125rem);
+  --text-lead: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  --text-figure: clamp(2.5rem, 2rem + 2vw, 3.25rem);
+  --text-title: clamp(3.5rem, 2.5rem + 4vw, 5rem);
+  --text-display: clamp(4rem, 2.5rem + 6.5vw, 7rem);
+
+  --tracking-tight: -0.04em;
+  --tracking-label: 0.14em;
+
+  /* ---------- Espaço ---------- */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-s: 0.75rem;
+  --space-m: 1rem;
+  --space-l: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+
+  --gutter: clamp(1.5rem, 8.3vw, 7.5rem);
+  --content-max: 56rem;
+  --radius-card: 0.875rem;
+  --radius-pill: 999px;
+
+  /* ---------- Movimento ---------- */
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1); /* quart */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --dur-instant: 120ms;
+  --dur-fast: 200ms;
+  --dur-base: 300ms;
+  --dur-entrance: 700ms;
+  --dur-beam: 1800ms; /* giro do feixe */
+  --stagger: 70ms;
+
+  /* ---------- Camadas ---------- */
+  --z-scene: 0;
+  --z-content: 1;
+  --z-chrome: 10;
+  --z-skip: 100;
+}
