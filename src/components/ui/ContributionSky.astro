@@ -1,0 +1,197 @@
+---
+/**
+ * Gráfico de contribuições desenhado como céu: uma estrela por dia.
+ * Gerado no build a partir de lib/github.ts; a animação de entrada
+ * (coluna a coluna) começa quando a seção recebe .is-visible.
+ */
+import type { ContributionDay } from '@/lib/github';
+import { format, type Locale } from '@/i18n/ui';
+
+interface Props {
+  weeks: ContributionDay[][];
+  locale: Locale;
+  labels: { weeks: string; less: string; more: string; day: string };
+}
+const { weeks, locale, labels } = Astro.props;
+
+const CELL = 13;
+const TOP = 18;
+/** Raio da estrela por nível de atividade (0–4); cor e opacidade ficam no CSS. */
+const radius = [1.4, 2.3, 3, 3.7, 4.3];
+
+const dateFmt = new Intl.DateTimeFormat(locale === 'pt' ? 'pt-BR' : 'en-US', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+const monthFmt = new Intl.DateTimeFormat(locale === 'pt' ? 'pt-BR' : 'en-US', { month: 'short', timeZone: 'UTC' });
+const asDate = (iso: string) => new Date(`${iso}T00:00:00Z`);
+
+/** Rótulo do mês na coluna em que o mês começa. */
+const months = weeks.flatMap((week, col) => {
+  const first = week[0];
+  if (!first) return [];
+  const d = asDate(first.date);
+  const isNewMonth = col === 0 || d.getUTCDate() <= 7;
+  return isNewMonth && col < weeks.length - 2 ? [{ col, label: monthFmt.format(d).replace('.', '') }] : [];
+});
+
+const width = weeks.length * CELL;
+const height = TOP + 7 * CELL;
+---
+
+{
+  weeks.length > 0 && (
+    <figure class="sky" data-reveal>
+      <figcaption class="sky__caption">
+        <span class="mono-label">{labels.weeks}</span>
+        <span class="sky__legend" aria-hidden="true">
+          {labels.less}
+          <i class="l1" />
+          <i class="l2" />
+          <i class="l3" />
+          {labels.more}
+        </span>
+      </figcaption>
+      <svg class="sky__svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={labels.weeks}>
+        {months.map((m) => (
+          <text x={m.col * CELL + 1} y="9" class="sky__month">
+            {m.label}
+          </text>
+        ))}
+        {weeks.map((week, col) =>
+          week.map((day) => {
+            const row = asDate(day.date).getUTCDay();
+            return (
+              <circle
+                class:list={['sky__star', `lv${day.level}`]}
+                style={`--c: ${col}`}
+                cx={col * CELL + CELL / 2}
+                cy={TOP + row * CELL + CELL / 2}
+                r={radius[day.level]}
+              >
+                <title>{format(labels.day, { count: day.count, date: dateFmt.format(asDate(day.date)) })}</title>
+              </circle>
+            );
+          }),
+        )}
+      </svg>
+    </figure>
+  )
+}
+
+<style>
+  /* painel discreto: separa o céu de estrelas das montanhas e do horizonte atrás */
+  .sky {
+    margin: 0;
+    width: min(100%, 45rem, var(--clear-of-lighthouse));
+    padding: var(--space-m) var(--space-m) var(--space-s);
+    border: 1px solid color-mix(in oklch, var(--nevoa) 14%, transparent);
+    border-radius: var(--radius-card);
+    background: color-mix(in oklch, var(--noite-funda) 72%, transparent);
+    backdrop-filter: blur(2px);
+  }
+  .sky__caption {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-xs);
+  }
+  .sky__legend {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font: 400 var(--text-label) var(--font-mono);
+    color: var(--luz);
+  }
+  .sky__legend i {
+    border-radius: 50%;
+    background: var(--luz);
+  }
+  .sky__legend .l1 {
+    width: 4px;
+    height: 4px;
+    opacity: 0.7;
+  }
+  .sky__legend .l2 {
+    width: 6px;
+    height: 6px;
+    opacity: 0.9;
+  }
+  .sky__legend .l3 {
+    width: 8px;
+    height: 8px;
+    box-shadow: 0 0 8px var(--luz);
+  }
+  .sky__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .sky__month {
+    font: 400 0.625rem var(--font-mono);
+    fill: color-mix(in oklch, var(--farol-creme) 70%, transparent);
+  }
+  .sky__star {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+  .sky.is-visible .sky__star {
+    /* varredura coluna a coluna, limitada a ~1,8 s no total */
+    --sweep: calc(var(--c) * 35ms);
+    animation:
+      acender var(--dur-entrance) var(--ease-out) forwards,
+      cintilar 5s var(--ease-in-out) infinite;
+    animation-delay: var(--sweep), calc(var(--sweep) + var(--dur-entrance));
+  }
+  /* quanto mais commits, mais a estrela brilha */
+  .sky__star.lv2 {
+    filter: drop-shadow(0 0 2px var(--luz));
+  }
+  .sky__star.lv3 {
+    filter: drop-shadow(0 0 5px var(--luz));
+  }
+  .sky__star.lv4 {
+    filter: drop-shadow(0 0 4px var(--luz)) drop-shadow(0 0 10px var(--luz));
+  }
+  .sky__star {
+    fill: var(--luz);
+  }
+  .sky__star.lv0 {
+    fill: var(--nevoa);
+    fill-opacity: 0.38;
+  }
+  .sky__star.lv1 {
+    fill-opacity: 0.7;
+  }
+  .sky__star.lv2 {
+    fill-opacity: 0.88;
+  }
+  @media (--hover) {
+    .sky__star:hover {
+      transform: scale(1.8);
+    }
+  }
+  @keyframes acender {
+    from {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes cintilar {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  @media (--reduced-motion) {
+    .sky__star {
+      opacity: 1;
+    }
+  }
+</style>

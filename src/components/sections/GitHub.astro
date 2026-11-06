@@ -1,0 +1,84 @@
+---
+import { bearingOf } from '@/data/sections';
+import type { GitHubStats } from '@/lib/github';
+import { useTranslations, type Locale } from '@/i18n/ui';
+import ContributionSky from '@/components/ui/ContributionSky.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+  stats: GitHubStats;
+}
+const { locale, stats } = Astro.props;
+const t = useTranslations(locale);
+const number = new Intl.NumberFormat(locale === 'pt' ? 'pt-BR' : 'en-US');
+
+const figures = [
+  { value: stats.totalContributions, label: t.github.contributions, highlight: true },
+  { value: stats.publicRepos, label: t.github.repos },
+  { value: stats.followers, label: t.github.followers },
+];
+---
+
+<section id="github" class="section" data-section="github" data-bearing={bearingOf('github')}>
+  <SectionHeader section="github" title={t.github.title} description={t.github.description} />
+
+  <dl class="figures" data-reveal>
+    {
+      figures.map((f) => (
+        <div class:list={['figure', { 'figure--highlight': f.highlight }]}>
+          <dt class="mono-label">{f.label}</dt>
+          <dd>{number.format(f.value)}</dd>
+        </div>
+      ))
+    }
+  </dl>
+
+  <ContributionSky
+    weeks={stats.weeks}
+    locale={locale}
+    labels={{ weeks: t.github.weeks, less: t.github.less, more: t.github.more, day: t.github.day }}
+  />
+
+  <a class="btn btn--solid" href={`https://github.com/${stats.user}`} target="_blank" rel="noopener" data-reveal>
+    @{stats.user} ↗
+  </a>
+</section>
+
+<style>
+  #github .btn {
+    align-self: flex-start;
+  }
+  .figures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-l) var(--space-2xl);
+    margin: 0;
+  }
+  .figure {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--space-2xs);
+  }
+  .figure dd {
+    margin: 0;
+    font-size: var(--text-figure);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .figure--highlight {
+    flex-basis: 100%;
+  }
+  .figure--highlight dd {
+    font-weight: 600;
+    color: var(--luz);
+    text-shadow: 0 0 24px color-mix(in oklch, var(--luz) 25%, transparent);
+  }
+  @media (--tablet) {
+    .figure--highlight {
+      flex-basis: auto;
+    }
+  }
+</style>
