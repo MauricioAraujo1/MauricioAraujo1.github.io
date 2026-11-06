@@ -1,0 +1,241 @@
+---
+/**
+ * Um porto da trajetória. Experiências com bullets viram um <details>
+ * (acordeão exclusivo via name="journey": abrir um fecha o anterior);
+ * o porto atual já vem aberto. Formação aparece sem expansão.
+ */
+import { BULLETS_PER_PORT, type Port } from '@/data/journey';
+import { format, pick, type Locale } from '@/i18n/ui';
+
+interface Props {
+  port: Port;
+  locale: Locale;
+  labels: { current: string; now: string; details: string };
+  index: number;
+}
+const { port, locale, labels, index } = Astro.props;
+
+const current = !port.end;
+const monthYear = new Intl.DateTimeFormat(locale === 'pt' ? 'pt-BR' : 'en-US', {
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+const formatMonth = (ym: string) => monthYear.format(new Date(`${ym}-01T00:00:00Z`)).replace('.', '').replace(' de ', ' ');
+const period =
+  port.kind === 'education'
+    ? `${port.start.slice(0, 4)} – ${port.end?.slice(0, 4) ?? labels.now}`
+    : `${formatMonth(port.start)} → ${port.end ? formatMonth(port.end) : labels.now}`;
+
+const bullets = port.bullets ? pick(port.bullets, locale).slice(0, BULLETS_PER_PORT) : [];
+const expandable = bullets.length > 0;
+---
+
+<li
+  class:list={['port', `port--${port.kind}`, { 'port--current': current }]}
+  style={`--i: ${index}`}
+  data-reveal
+>
+  <span class="port__light" aria-hidden="true"></span>
+  {
+    expandable ? (
+      <details class="port__body" name="journey" open={current}>
+        <summary class="port__head" aria-label={format(labels.details, { org: port.org })}>
+          <span class="port__period">{period}</span>
+          <span class="port__title">
+            <strong class="port__org">{port.org}</strong>
+            {current && <span class="port__tag">{labels.current}</span>}
+            <span class="port__role">{pick(port.role, locale)}</span>
+          </span>
+          <span class="port__chevron" aria-hidden="true" />
+        </summary>
+        <div class="port__details">
+          {port.place && <p class="port__place">{pick(port.place, locale)}</p>}
+          <ul class="port__bullets">
+            {bullets.map((b) => (
+              <li>{b}</li>
+            ))}
+          </ul>
+          {port.stack && <p class="port__stack">{port.stack.join(' · ')}</p>}
+        </div>
+      </details>
+    ) : (
+      <div class="port__body">
+        <div class="port__head">
+          <span class="port__period">{period}</span>
+          <span class="port__title">
+            <strong class="port__org">{port.org}</strong>
+            <span class="port__role">{pick(port.role, locale)}</span>
+          </span>
+        </div>
+      </div>
+    )
+  }
+</li>
+
+<style>
+  .port {
+    position: relative;
+    display: grid;
+    grid-template-columns: 0.75rem 1fr;
+    gap: var(--space-m);
+    list-style: none;
+  }
+  .port__light {
+    width: 10px;
+    height: 10px;
+    margin: 0.35rem 1px 0;
+    border: 2px solid var(--luz);
+    border-radius: 50%;
+    background: var(--noite);
+    transition:
+      background-color var(--dur-entrance),
+      box-shadow var(--dur-entrance);
+  }
+  /* formação: marcador vazado e mais discreto */
+  .port--education .port__light {
+    border-color: var(--nevoa);
+    border-radius: 2px;
+  }
+  /* acende quando o porto entra na tela */
+  .port.is-visible:not(.port--education) .port__light {
+    background: color-mix(in oklch, var(--luz) 35%, var(--noite));
+  }
+  .port--current.is-visible .port__light {
+    background: var(--luz);
+    box-shadow: 0 0 12px var(--luz);
+  }
+
+  /* Cabeçalho: período em cima no celular; coluna própria a partir do tablet */
+  .port__head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-2xs) var(--space-m);
+    align-items: baseline;
+    padding-block: var(--space-2xs);
+    list-style: none;
+  }
+  summary.port__head {
+    cursor: pointer;
+  }
+  summary.port__head::-webkit-details-marker {
+    display: none;
+  }
+  .port__period {
+    grid-column: 1 / -1;
+    font: 500 var(--text-label) / 1.4 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--nevoa);
+  }
+  .port--current .port__period {
+    color: var(--luz);
+  }
+  .port__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-s);
+  }
+  .port__org {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .port__role {
+    font-size: var(--text-small);
+    color: var(--nevoa);
+  }
+  .port__tag {
+    padding: 0.125rem var(--space-xs);
+    border: 1px solid var(--luz-media);
+    border-radius: var(--radius-pill);
+    font: 500 0.625rem / 1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--luz);
+  }
+  .port__chevron {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 1.5px solid var(--nevoa);
+    border-bottom: 1.5px solid var(--nevoa);
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+  details[open] .port__chevron {
+    transform: rotate(-135deg) translateY(-2px);
+  }
+
+  .port__details {
+    display: grid;
+    gap: var(--space-xs);
+    padding: var(--space-xs) 0 var(--space-s);
+  }
+  details[open] .port__details {
+    animation: abrir var(--dur-base) var(--ease-out);
+  }
+  .port__place {
+    margin: 0;
+    font: 400 var(--text-label) var(--font-mono);
+    color: var(--nevoa);
+  }
+  .port__bullets {
+    display: grid;
+    gap: var(--space-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .port__bullets li {
+    position: relative;
+    padding-left: var(--space-m);
+    font-size: var(--text-small);
+    line-height: 1.5;
+    color: color-mix(in oklch, var(--farol-creme) 85%, transparent);
+    max-width: 68ch;
+  }
+  /* marcador: pequena luz, no lugar do bullet padrão */
+  .port__bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--luz);
+    box-shadow: 0 0 6px var(--luz-halo);
+  }
+  .port__stack {
+    margin: 0;
+    font: 400 var(--text-label) / 1.5 var(--font-mono);
+    color: var(--luz);
+  }
+
+  @media (--tablet) {
+    .port__head {
+      grid-template-columns: 9.5rem 1fr auto;
+    }
+    .port__period {
+      grid-column: auto;
+    }
+    .port__details {
+      padding-left: calc(9.5rem + var(--space-m));
+    }
+  }
+  @media (--hover) {
+    summary.port__head:hover .port__org {
+      color: var(--luz);
+    }
+    summary.port__head:hover .port__chevron {
+      border-color: var(--luz);
+    }
+  }
+  @keyframes abrir {
+    from {
+      opacity: 0;
+      transform: translateY(calc(-1 * var(--space-xs)));
+    }
+  }
+</style>
