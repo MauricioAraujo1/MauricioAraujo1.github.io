@@ -1,0 +1,181 @@
+---
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { profile } from '@/data/profile';
+import { sections } from '@/data/sections';
+import { useTranslations, type Locale } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const otherLocale: Locale = locale === 'pt' ? 'en' : 'pt';
+---
+
+<header class="nav" data-nav>
+  <a class="nav__brand" href="#home">{profile.name.first} {profile.name.last}</a>
+
+  <nav class="nav__menu" id="nav-menu" aria-label={t.a11y.nav}>
+    <ul>
+      {
+        sections.map(({ id }) => (
+          <li>
+            <a href={`#${id}`} data-nav-link={id}>
+              {t.nav[id]}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <div class="nav__tools">
+    <a class="nav__lang" href={getRelativeLocaleUrl(otherLocale)} hreflang={otherLocale} aria-label={t.lang.label}>
+      <strong>{t.lang.current}</strong> / {t.lang.other}
+    </a>
+    <button
+      class="nav__toggle"
+      type="button"
+      aria-controls="nav-menu"
+      aria-expanded="false"
+      data-label-open={t.a11y.menu}
+      data-label-close={t.a11y.close}
+      aria-label={t.a11y.menu}
+    >
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<style>
+  /* Base (celular): marca + idioma + botão de menu; menu em painel. */
+  .nav {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: var(--z-chrome);
+    display: flex;
+    align-items: center;
+    gap: var(--space-l);
+    padding: max(var(--space-l), env(safe-area-inset-top)) max(var(--space-l), env(safe-area-inset-right)) var(--space-l)
+      max(var(--space-l), env(safe-area-inset-left));
+    font: 400 0.75rem var(--font-mono);
+    background: linear-gradient(to bottom, color-mix(in oklch, var(--noite-funda) 85%, transparent), transparent);
+  }
+  .nav__brand {
+    margin-right: auto;
+    font: 500 var(--text-mono) var(--font-mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+  .nav__menu {
+    position: fixed;
+    inset: 4rem var(--space-m) auto;
+    padding: var(--space-l);
+    border: 1px solid var(--nevoa-linha);
+    border-radius: var(--radius-card);
+    background: var(--painel-forte);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(calc(-1 * var(--space-xs)));
+    transition:
+      opacity var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out),
+      visibility var(--dur-fast);
+  }
+  .nav[data-open] .nav__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+  .nav__menu ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.9375rem;
+  }
+  .nav__menu a {
+    display: block;
+    padding-block: var(--space-2xs);
+    color: var(--nevoa);
+    text-decoration: none;
+    transition: color var(--dur-fast);
+  }
+  .nav__menu a[aria-current] {
+    color: var(--luz);
+  }
+  .nav__tools {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+  }
+  .nav__lang {
+    padding: var(--space-xs) var(--space-2xs);
+    color: var(--nevoa);
+    text-decoration: none;
+  }
+  .nav__lang strong {
+    color: var(--farol-creme);
+    font-weight: 500;
+  }
+  .nav__toggle {
+    display: grid;
+    gap: var(--space-2xs);
+    width: 2.75rem;
+    height: 2.75rem;
+    place-content: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .nav__toggle span {
+    width: 1.25rem;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--farol-creme);
+  }
+  .nav__toggle span:last-child {
+    width: 0.875rem;
+    justify-self: end;
+    background: var(--luz);
+  }
+
+  /* Telas largas: menu inline, sem botão. */
+  @media (--nav-full) {
+    .nav {
+      gap: var(--space-l);
+      padding: 1.75rem 4rem;
+    }
+    .nav__menu {
+      position: static;
+      padding: 0;
+      border: 0;
+      background: none;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+    }
+    .nav__menu ul {
+      flex-direction: row;
+      gap: 1.75rem;
+      font-size: inherit;
+    }
+    .nav__tools {
+      padding-left: 1.75rem;
+      border-left: 1px solid var(--nevoa-linha);
+    }
+    .nav__toggle {
+      display: none;
+    }
+  }
+  @media (--hover) {
+    .nav__menu a:hover,
+    .nav__lang:hover {
+      color: var(--luz);
+    }
+  }
+</style>
