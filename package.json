@@ -1,0 +1,24 @@
+{
+  "name": "farol-portfolio",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@12.18.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "^5.3.0",
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "astro": "^7.4.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@csstools/postcss-global-data": "^4.0.0",
+    "postcss-custom-media": "^12.0.3",
+    "typescript": "^6.0.3"
+  }
+}
