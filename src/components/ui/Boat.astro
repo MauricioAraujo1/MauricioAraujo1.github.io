@@ -1,0 +1,52 @@
+---
+interface Props {
+  /** Barco "no feixe": luz do mastro mais forte. */
+  lit?: boolean;
+}
+const { lit = false } = Astro.props;
+---
+
+<svg class:list={['boat', { 'boat--lit': lit }]} viewBox="-2 -4 44 34" aria-hidden="true">
+  <path d="M0 20 H40 L33 28 H7 Z" fill="#c9463d"></path>
+  <rect x="19" y="2" width="2" height="18" fill="#efe6d2"></rect>
+  <path d="M22 4 V18 H34 Z" fill="#efe6d2"></path>
+  <path d="M18 7 V18 H10 Z" fill="#efe6d2" opacity="0.7"></path>
+  <circle class="boat__light" cx="20" cy="0" r="3" fill="#ffe3a1"></circle>
+</svg>
+
+<style>
+  .boat {
+    width: 2.5rem;
+    aspect-ratio: 44 / 34;
+    flex: none;
+    overflow: visible;
+    transform-origin: 50% 85%;
+    animation: marola 4s var(--ease-in-out) infinite;
+  }
+  .boat__light {
+    opacity: 0.55;
+    filter: drop-shadow(0 0 5px var(--luz));
+    animation: pulso 3s var(--ease-in-out) infinite;
+    transition: opacity var(--dur-base);
+  }
+  .boat--lit .boat__light {
+    opacity: 1;
+    filter: drop-shadow(0 0 9px var(--luz));
+  }
+  @media (--hover) {
+    :global(.project:hover) .boat__light {
+      opacity: 1;
+      filter: drop-shadow(0 0 9px var(--luz));
+    }
+  }
+  @keyframes marola {
+    50% {
+      transform: translateY(2px) rotate(-2deg);
+    }
+  }
+  @keyframes pulso {
+    50% {
+      opacity: 0.9;
+    }
+  }
+</style>
