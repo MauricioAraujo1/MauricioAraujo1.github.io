@@ -1,0 +1,43 @@
+---
+import { bearingOf } from '@/data/sections';
+import { stack } from '@/data/stack';
+import { useTranslations, type Locale } from '@/i18n/ui';
+import Buoy from '@/components/ui/Buoy.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+}
+const t = useTranslations(Astro.props.locale);
+---
+
+<section id="stack" class="section stack" data-section="stack" data-bearing={bearingOf('stack')}>
+  <SectionHeader section="stack" title={t.stack.title} description={t.stack.description} />
+  <ul class="stack__buoys">
+    {stack.map((label, i) => <Buoy label={label} index={i} />)}
+  </ul>
+</section>
+
+<style>
+  .stack__buoys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m) var(--space-s);
+    margin: 0;
+    padding: 0;
+  }
+  /* Stage: cabeçalho no céu e boias ancoradas no mar, logo abaixo do horizonte. */
+  @media (--stage) {
+    .stack {
+      justify-content: flex-start;
+      padding-top: calc(var(--horizon) * 0.4); /* cabeçalho no terço alto do céu */
+    }
+    .stack__buoys {
+      position: absolute;
+      top: calc(var(--horizon) + var(--space-m));
+      inset-inline: var(--gutter);
+      max-width: var(--content-max);
+      gap: 2.6svh var(--space-xl);
+    }
+  }
+</style>
