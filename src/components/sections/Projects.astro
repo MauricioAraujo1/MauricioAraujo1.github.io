@@ -1,0 +1,51 @@
+---
+import { bearingOf } from '@/data/sections';
+import { projects } from '@/data/projects';
+import { profile } from '@/data/profile';
+import { format, useTranslations, type Locale } from '@/i18n/ui';
+import ProjectCard from '@/components/ui/ProjectCard.astro';
+import SectionHeader from '@/components/ui/SectionHeader.astro';
+
+interface Props {
+  locale: Locale;
+  repoCount: number;
+}
+const { locale, repoCount } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section id="projects" class="section projects" data-section="projects" data-bearing={bearingOf('projects')}>
+  <SectionHeader section="projects" title={t.projects.title} description={t.projects.description} />
+  <div class="projects__grid">
+    {projects.map((project, i) => <ProjectCard project={project} locale={locale} demoLabel={t.projects.demo} index={i} />)}
+    <a class="projects__all" href={`${profile.github.url}?tab=repositories`} target="_blank" rel="noopener">
+      {format(t.projects.all, { count: repoCount })}
+    </a>
+  </div>
+</section>
+
+<style>
+  /* O grid responde ao espaço do próprio bloco (container query), não à tela. */
+  .projects {
+    container: projects / inline-size;
+    width: 100%;
+  }
+  .projects__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-s) var(--space-m);
+    align-items: start;
+  }
+  .projects__all {
+    align-self: center;
+    padding: var(--space-xs) var(--space-2xs);
+    font: 400 var(--text-mono) var(--font-mono);
+    color: var(--luz);
+    text-underline-offset: 4px;
+  }
+  @container projects (min-width: 52rem) {
+    .projects__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
