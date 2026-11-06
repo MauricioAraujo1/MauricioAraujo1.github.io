@@ -1,0 +1,84 @@
+---
+import { profile } from '@/data/profile';
+import { useTranslations, type Locale } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+const t = useTranslations(Astro.props.locale);
+---
+
+<section id="home" class="section hero" data-section="home">
+  <div class="hero__content">
+    <p class="mono-label hero__location">{t.hero.location}</p>
+    <h1 class="hero__name">
+      <span>{profile.name.first}</span>
+      <span class="hero__last">{profile.name.last}</span>
+    </h1>
+    <p class="hero__role">{t.hero.role}</p>
+    <p class="lead hero__summary">{t.hero.summary}</p>
+    <div class="hero__actions">
+      <a class="btn btn--solid" href="#stack" data-light-beacon>
+        <span class="hero__dot" aria-hidden="true"></span>{t.hero.cta}
+      </a>
+      <span class="mono-label hero__hint">{t.hero.hint}</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero__content {
+    display: grid;
+    gap: var(--space-m);
+    max-width: 42.5rem;
+  }
+  .hero__location {
+    margin: 0;
+  }
+  .hero__name {
+    display: grid;
+    margin: 0;
+    font-size: var(--text-display);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: var(--tracking-tight);
+  }
+  .hero__last {
+    color: var(--luz);
+    text-shadow: 0 0 32px color-mix(in oklch, var(--luz) 15%, transparent);
+  }
+  .hero__role {
+    margin: 0;
+    font-size: var(--text-lead);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .hero__summary {
+    max-width: 42ch;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-l);
+    padding-top: var(--space-xs);
+  }
+  .hero__dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--noite);
+  }
+  /* a dica de rolagem só faz sentido onde a rolagem é por passos */
+  .hero__hint {
+    display: none;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  @media (--stage) {
+    .hero__hint {
+      display: inline;
+    }
+  }
+</style>
