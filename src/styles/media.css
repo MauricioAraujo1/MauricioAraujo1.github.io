@@ -1,0 +1,15 @@
+/*
+ * Breakpoints guiados pelo conteúdo (mobile-first: o CSS base é o celular).
+ *
+ * Modos de layout:
+ *   fluxo (base)  rolagem normal, cena reduzida e ancorada embaixo
+ *   --stage       cada seção é um passo de tela cheia, cena ocupa a altura
+ *                 (precisa de tela larga e baixa o bastante para o conteúdo caber)
+ */
+@custom-media --tablet (min-width: 48em);
+@custom-media --nav-full (min-width: 56em);
+@custom-media --stage (min-width: 56em) and (min-height: 38em);
+
+/* Entrada: hover só onde existe mouse/trackpad */
+@custom-media --hover (hover: hover) and (pointer: fine);
+@custom-media --reduced-motion (prefers-reduced-motion: reduce);
