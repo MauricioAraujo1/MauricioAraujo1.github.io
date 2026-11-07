@@ -5,12 +5,12 @@
  * (coluna a coluna) começa quando a seção recebe .is-visible.
  */
 import type { ContributionDay } from '@/lib/github';
-import { format, type Locale } from '@/i18n/ui';
+import { format, plural, type Locale, type Plural } from '@/i18n/ui';
 
 interface Props {
   weeks: ContributionDay[][];
   locale: Locale;
-  labels: { weeks: string; less: string; more: string; day: string };
+  labels: { weeks: string; less: string; more: string; day: Plural };
 }
 const { weeks, locale, labels } = Astro.props;
 
@@ -66,7 +66,7 @@ const height = TOP + 7 * CELL;
                 cy={TOP + row * CELL + CELL / 2}
                 r={radius[day.level]}
               >
-                <title>{format(labels.day, { count: day.count, date: dateFmt.format(asDate(day.date)) })}</title>
+                <title>{format(plural(labels.day, day.count), { count: day.count, date: dateFmt.format(asDate(day.date)) })}</title>
               </circle>
             );
           }),
