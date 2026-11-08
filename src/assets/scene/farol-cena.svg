@@ -28,6 +28,7 @@
     <linearGradient id="linear-gradient-3" x1="1120" y1="276" x2="-40" y2="240" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#ffe3a1" stop-opacity="0.6"/>
       <stop offset="0.45" stop-color="#ffe3a1" stop-opacity="0.18"/>
+      <stop offset="0.96" stop-color="#ffe3a1" stop-opacity="0.013"/>
       <stop offset="1" stop-color="#ffe3a1" stop-opacity="0"/>
     </linearGradient>
     <filter id="filter-3" filterUnits="userSpaceOnUse" x="-49.5" y="190.5" width="1179" height="109" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/></filter>

@@ -4,7 +4,8 @@
  *   data-section="<id>"    seção visível
  *   data-lamp="on|off"     lâmpada no Morse (contato)
  *   --beam-rot             rotação do feixe (rumo − repouso)
- *   --beam-reach           alongamento do feixe ao mirar um barco (1 = desenho original)
+ *   --beam-reach           comprimento do feixe ao mirar um barco (1 = desenho original)
+ *   --beam-spread          abertura do feixe ao mirar um barco (1 = desenho original)
  *   --progress             0→1 ao longo da página (parallax)
  * Posições usam --scene-* (geometry.ts) e --scene-u (global.css).
  */
@@ -77,9 +78,28 @@
 #feixe > g:not(:has(#reflexo-feixe)) {
   transform-box: view-box;
   transform-origin: calc(var(--scene-lantern-x) * 1px) calc(var(--scene-lantern-y) * 1px);
-  /* --beam-reach estica o feixe ao longo do eixo (mirando um barco distante) */
-  transform: rotate(var(--beam-rot, 0deg)) scaleX(var(--beam-reach, 1));
+  transform: rotate(var(--beam-rot, 0deg));
   transition: opacity var(--dur-entrance) var(--ease-out);
+}
+/* Mirando um barco, o feixe da frente (não o de trás) muda de comprimento para a ponta
+   cair no casco (--beam-reach) e fecha a abertura no tamanho dele (--beam-spread);
+   o degradê ganha força até a ponta. */
+#feixe > g:is(:has(#feixe-principal), :has(#feixe-nucleo)) {
+  transform: rotate(var(--beam-rot, 0deg)) scale(var(--beam-reach, 1), var(--beam-spread, 1));
+}
+#linear-gradient-3 stop,
+#linear-gradient-4 stop {
+  transition: stop-opacity var(--dur-base) var(--ease-out);
+}
+html[data-beam-aim] #linear-gradient-3 stop:nth-child(2) {
+  stop-opacity: 0.32;
+}
+/* o casco fica a 96% do feixe: forte até ele, e some dentro do próprio barco */
+html[data-beam-aim] #linear-gradient-3 stop:nth-child(3) {
+  stop-opacity: 0.2;
+}
+html[data-beam-aim] #linear-gradient-4 stop:nth-child(2) {
+  stop-opacity: 0.08;
 }
 html[data-beam='turning'] #feixe > g:not(:has(#reflexo-feixe)) {
   transition:
