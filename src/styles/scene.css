@@ -4,6 +4,7 @@
  *   data-section="<id>"    seção visível
  *   data-lamp="on|off"     lâmpada no Morse (contato)
  *   --beam-rot             rotação do feixe (rumo − repouso)
+ *   --beam-reach           alongamento do feixe ao mirar um barco (1 = desenho original)
  *   --progress             0→1 ao longo da página (parallax)
  * Posições usam --scene-* (geometry.ts) e --scene-u (global.css).
  */
@@ -76,7 +77,8 @@
 #feixe > g:not(:has(#reflexo-feixe)) {
   transform-box: view-box;
   transform-origin: calc(var(--scene-lantern-x) * 1px) calc(var(--scene-lantern-y) * 1px);
-  transform: rotate(var(--beam-rot, 0deg));
+  /* --beam-reach estica o feixe ao longo do eixo (mirando um barco distante) */
+  transform: rotate(var(--beam-rot, 0deg)) scaleX(var(--beam-reach, 1));
   transition: opacity var(--dur-entrance) var(--ease-out);
 }
 html[data-beam='turning'] #feixe > g:not(:has(#reflexo-feixe)) {
