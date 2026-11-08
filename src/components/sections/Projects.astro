@@ -200,8 +200,8 @@ const t = useTranslations(locale);
       pointer-events: none;
     }
     .moored {
-      /* --scene-u já é um comprimento: 40 unidades da cena × profundidade */
-      --boat-w: calc(40 * var(--s) * var(--scene-u));
+      /* --scene-u já é um comprimento: 60 unidades da cena × profundidade */
+      --boat-w: calc(60 * var(--s) * var(--scene-u));
       position: absolute;
       /* faixa livre entre a margem e o farol; y abaixo do horizonte */
       left: calc(var(--gutter) + var(--x) * (var(--clear-of-lighthouse) - var(--boat-w) - 3rem));
@@ -235,7 +235,7 @@ const t = useTranslations(locale);
       content: '';
       position: absolute;
       left: 50%;
-      top: calc(var(--boat-w) * 0.7);
+      top: calc(var(--boat-w) * 0.6);
       width: calc(var(--boat-w) * 2.4);
       height: calc(var(--boat-w) * 0.22);
       translate: -50% 0;
