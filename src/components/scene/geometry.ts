@@ -29,6 +29,19 @@ export const egg = {
   portal: { x: 820, y: 70, width: 70, height: 100 },
 } as const;
 
+/**
+ * Ancoragem dos barcos de projetos no mar (stage), na ordem de `projects`.
+ * `x` é a fração (0–1) da faixa livre entre a margem e o farol; `y` são unidades
+ * da cena abaixo do horizonte; `scale` dá a profundidade (menor = mais longe).
+ */
+export const moorings = [
+  { x: 0.45, y: 76, scale: 2 },
+  { x: 0.03, y: 108, scale: 2.3 },
+  { x: 0.24, y: 24, scale: 1.4 },
+  { x: 0.64, y: 136, scale: 2.1 },
+  { x: 0.78, y: 6, scale: 1.2 },
+] as const;
+
 /** Caminho do avião: entra pela esquerda e sai pela direita. */
 export const flight = { fromY: 190, toY: 120, margin: 80 } as const;
 

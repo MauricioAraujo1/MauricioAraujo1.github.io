@@ -6,6 +6,7 @@ import Nav from '@/components/layout/Nav.astro';
 import Scene from '@/components/scene/Scene.astro';
 import Contact from '@/components/sections/Contact.astro';
 import GitHub from '@/components/sections/GitHub.astro';
+import Harbor from '@/components/sections/Harbor.astro';
 import Hero from '@/components/sections/Hero.astro';
 import Journey from '@/components/sections/Journey.astro';
 import Projects from '@/components/sections/Projects.astro';
@@ -32,6 +33,7 @@ const stats = await getGitHubStats(profile.github.user);
     <Journey locale={locale} />
     <Contact locale={locale} />
   </main>
+  <Harbor locale={locale} repoCount={stats.publicRepos} />
   <Footer />
 </BaseLayout>
 

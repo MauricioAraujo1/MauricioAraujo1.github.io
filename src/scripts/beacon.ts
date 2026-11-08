@@ -10,6 +10,7 @@ import { profile } from '@/data/profile';
 import { sections as sectionData } from '@/data/sections';
 import { clockwiseDelta, flashGroup, parseCharacter } from '@/lib/lighthouse';
 import { prefersReducedMotion, sleep } from './motion';
+import { cue } from './sound';
 
 /** Velocidade do giro entre rumos e da deriva depois de chegar. */
 const TURN_DEG_PER_S = 110;
@@ -62,6 +63,7 @@ export async function lightBeacon(): Promise<void> {
   const { onMs, offMs } = flashGroup(character);
   for (let i = 0; i < character.flashes; i++) {
     root.dataset.lamp = 'on';
+    cue('lens');
     await sleep(onMs);
     root.dataset.lamp = 'off';
     await sleep(offMs);

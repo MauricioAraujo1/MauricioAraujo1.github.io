@@ -1,0 +1,350 @@
+---
+/**
+ * O porto: vitrine de projetos em tela cheia, aberta pelo botão "Entrar no porto"
+ * ou por um barco (scripts/harbor.ts). É um <dialog> modal: foco preso dentro,
+ * Esc fecha. O endereço ganha #porto, então trocar de idioma reabre a vitrine.
+ */
+import { getRelativeLocaleUrl } from 'astro:i18n';
+import { profile } from '@/data/profile';
+import { projects } from '@/data/projects';
+import { format, locales, useTranslations, type Locale } from '@/i18n/ui';
+import ShowcaseCard from '@/components/ui/ShowcaseCard.astro';
+import SoundToggle from '@/components/ui/SoundToggle.astro';
+
+interface Props {
+  locale: Locale;
+  repoCount: number;
+}
+const { locale, repoCount } = Astro.props;
+const t = useTranslations(locale);
+const others = Math.max(0, repoCount - projects.length);
+---
+
+<dialog class="harbor" id="porto" aria-labelledby="porto-title" data-harbor>
+  <div class="harbor__inner">
+    <header class="harbor__bar">
+      <p class="harbor__trail">
+        <strong>{profile.name.first} {profile.name.last}</strong>
+        <span aria-hidden="true">/</span>
+        {t.harbor.trail}
+        <span aria-hidden="true">/</span>
+        {t.harbor.section}
+      </p>
+      <div class="harbor__tools">
+        <SoundToggle locale={locale} />
+        <nav class="harbor__lang" aria-label={t.lang.label}>
+          {
+            locales.map((l) => (
+              <a
+                href={`${getRelativeLocaleUrl(l)}#porto`}
+                hreflang={l}
+                lang={l}
+                aria-current={l === locale ? 'page' : undefined}
+              >
+                {l.toUpperCase()}
+              </a>
+            ))
+          }
+        </nav>
+        <form method="dialog">
+          <button class="harbor__close" type="submit">
+            <span aria-hidden="true">✕</span>
+            <span class="harbor__close-label">{t.harbor.close}</span>
+            <kbd>esc</kbd>
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <div class="harbor__head">
+      <h2 class="harbor__title" id="porto-title">{t.harbor.title}</h2>
+      <p class="mono-label">{format(t.harbor.meta, { projects: projects.length, repos: repoCount })}</p>
+    </div>
+
+    <ul class="harbor__grid">
+      {
+        projects.map((project) => (
+          <li>
+            <ShowcaseCard project={project} locale={locale} />
+          </li>
+        ))
+      }
+      <li>
+        <a class="harbor__more" href={`${profile.github.url}?tab=repositories`} target="_blank" rel="noopener">
+          <strong>+{others}</strong>
+          <span>{t.harbor.more} ↗</span>
+        </a>
+      </li>
+    </ul>
+
+    <footer class="harbor__closing">
+      <div>
+        <p class="harbor__closing-title">{t.harbor.closingTitle}</p>
+        <p class="mono-label">{t.harbor.closingCaption}</p>
+      </div>
+      <div class="harbor__actions">
+        <a class="btn btn--solid" href="#contact" data-harbor-leave>
+          <span class="harbor__signal" aria-hidden="true"></span>
+          {t.harbor.signal}
+        </a>
+        <form method="dialog">
+          <button class="btn harbor__back" type="submit">{t.harbor.back}</button>
+        </form>
+      </div>
+    </footer>
+  </div>
+</dialog>
+
+<style>
+  .harbor {
+    /* tela cheia por cima da cena; rola por dentro */
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: color-mix(in oklch, var(--noite-funda) 92%, transparent);
+    color: var(--farol-creme);
+    scrollbar-gutter: stable;
+  }
+  /* a página atrás não rola enquanto o porto está aberto */
+  :global(html:has(.harbor[open])) {
+    overflow: hidden;
+  }
+  .harbor::backdrop {
+    background: transparent;
+    backdrop-filter: blur(6px);
+  }
+  .harbor[open] {
+    animation: atracar var(--dur-entrance) var(--ease-out);
+  }
+  .harbor__inner {
+    display: grid;
+    gap: var(--space-xl);
+    /* 75rem de conteúdo (3 colunas no desktop) + as margens */
+    max-width: calc(75rem + 2 * var(--gutter));
+    margin-inline: auto;
+    padding: max(var(--space-l), env(safe-area-inset-top)) var(--gutter) max(var(--space-xl), env(safe-area-inset-bottom));
+  }
+
+  .harbor__bar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-m);
+    margin-inline: calc(-1 * var(--space-s));
+    padding: var(--space-s);
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklch, var(--noite-funda) 85%, transparent);
+    backdrop-filter: blur(8px);
+  }
+  .harbor__trail {
+    display: none;
+    gap: var(--space-s);
+    margin: 0;
+    font: 400 var(--text-mono) var(--font-mono);
+    color: var(--nevoa);
+  }
+  .harbor__trail strong {
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--farol-creme);
+  }
+  .harbor__tools {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-left: auto;
+  }
+  .harbor__tools form {
+    display: contents;
+  }
+  .harbor__lang {
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid color-mix(in oklch, var(--nevoa) 35%, transparent);
+    border-radius: var(--radius-pill);
+    font: 500 var(--text-label) var(--font-mono);
+    letter-spacing: 0.08em;
+  }
+  .harbor__lang a {
+    padding: var(--space-xs) var(--space-s);
+    border-radius: var(--radius-pill);
+    color: var(--nevoa);
+    text-decoration: none;
+  }
+  .harbor__lang a[aria-current] {
+    background: var(--farol-creme);
+    color: var(--noite);
+  }
+  .harbor__close {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-s);
+    min-height: 2.5rem;
+    padding: 0 var(--space-s) 0 var(--space-m);
+    border: 1px solid color-mix(in oklch, var(--nevoa) 35%, transparent);
+    border-radius: var(--radius-pill);
+    background: none;
+    color: var(--farol-creme);
+    font: 500 var(--text-small) var(--font-sans);
+    cursor: pointer;
+  }
+  .harbor__close-label,
+  .harbor__close kbd {
+    display: none;
+  }
+  .harbor__close kbd {
+    padding: 1px var(--space-xs);
+    border: 1px solid color-mix(in oklch, var(--nevoa) 35%, transparent);
+    border-radius: 6px;
+    font: 400 0.6875rem var(--font-mono);
+    color: var(--nevoa);
+  }
+
+  .harbor__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-xs) var(--space-l);
+  }
+  .harbor__title {
+    margin: 0;
+    font-size: clamp(1.875rem, 1.2rem + 2vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+
+  .harbor__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--space-l);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .harbor__grid > li {
+    display: grid;
+    animation: subir var(--dur-entrance) var(--ease-out) backwards;
+  }
+  .harbor__grid > li:nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .harbor__grid > li:nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .harbor__grid > li:nth-child(4) {
+    animation-delay: 180ms;
+  }
+  .harbor__grid > li:nth-child(5) {
+    animation-delay: 240ms;
+  }
+  .harbor__grid > li:nth-child(6) {
+    animation-delay: 300ms;
+  }
+  .harbor__more {
+    display: grid;
+    place-content: center;
+    gap: var(--space-xs);
+    min-height: 12rem;
+    border: 1px dashed var(--luz-media);
+    border-radius: var(--radius-card);
+    text-align: center;
+    text-decoration: none;
+    color: var(--nevoa);
+    font: 400 var(--text-label) var(--font-mono);
+    transition: border-color var(--dur-base), background-color var(--dur-base);
+  }
+  .harbor__more strong {
+    font: 600 2.75rem / 1 var(--font-sans);
+    letter-spacing: -0.03em;
+    color: var(--luz);
+  }
+
+  .harbor__closing {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-l);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--nevoa-linha);
+  }
+  .harbor__closing-title {
+    margin: 0 0 var(--space-s);
+    font-size: clamp(1.875rem, 1rem + 3vw, 3.25rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+  .harbor__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+  }
+  .harbor__actions form {
+    display: contents;
+  }
+  .harbor__signal {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--noite);
+  }
+  .harbor__back {
+    border-color: color-mix(in oklch, var(--nevoa) 40%, transparent);
+    background: none;
+    color: var(--farol-creme);
+  }
+
+  @media (--tablet) {
+    .harbor__trail {
+      display: flex;
+    }
+    .harbor__close-label,
+    .harbor__close kbd {
+      display: inline;
+    }
+  }
+  @media (--hover) {
+    .harbor__lang a:not([aria-current]):hover,
+    .harbor__close:hover {
+      color: var(--luz);
+    }
+    .harbor__more:hover {
+      border-color: var(--luz);
+      background: var(--luz-sutil);
+    }
+    .harbor__back:hover {
+      border-color: var(--luz);
+      color: var(--luz);
+    }
+  }
+  @media (--reduced-motion) {
+    .harbor[open],
+    .harbor__grid > li {
+      animation: none;
+    }
+  }
+  @keyframes atracar {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes subir {
+    from {
+      opacity: 0;
+      transform: translateY(var(--space-m));
+    }
+  }
+</style>
