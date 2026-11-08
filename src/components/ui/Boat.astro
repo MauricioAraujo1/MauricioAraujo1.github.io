@@ -34,7 +34,8 @@ const { lit = false } = Astro.props;
     filter: drop-shadow(0 0 9px var(--luz));
   }
   @media (--hover) {
-    :global(.project:hover) .boat__light {
+    :global(.moored:hover) .boat__light,
+    :global(.moored:focus-within) .boat__light {
       opacity: 1;
       filter: drop-shadow(0 0 9px var(--luz));
     }

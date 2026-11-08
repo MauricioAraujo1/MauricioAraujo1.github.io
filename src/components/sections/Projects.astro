@@ -1,9 +1,15 @@
 ---
-import { bearingOf } from '@/data/sections';
-import { projects } from '@/data/projects';
+/**
+ * Projetos: barcos ancorados no mar. No stage cada barco tem a prévia no hover
+ * e as posições vêm de `moorings` (geometry.ts); no fluxo (celular) a mesma lista
+ * vira um carrossel de cartões. Barco ou botão abrem o porto (Harbor.astro).
+ */
+import { moorings } from '@/components/scene/geometry';
 import { profile } from '@/data/profile';
-import { format, useTranslations, type Locale } from '@/i18n/ui';
-import ProjectCard from '@/components/ui/ProjectCard.astro';
+import { projects, techOf } from '@/data/projects';
+import { bearingOf } from '@/data/sections';
+import { format, pick, useTranslations, type Locale } from '@/i18n/ui';
+import Boat from '@/components/ui/Boat.astro';
 import SectionHeader from '@/components/ui/SectionHeader.astro';
 
 interface Props {
@@ -14,47 +20,268 @@ const { locale, repoCount } = Astro.props;
 const t = useTranslations(locale);
 ---
 
-<section id="projects" class="section section--tall projects" data-section="projects" data-bearing={bearingOf('projects')}>
+<section id="projects" class="section projects" data-section="projects" data-bearing={bearingOf('projects')}>
   <SectionHeader section="projects" title={t.projects.title} description={t.projects.description} />
-  <div class="projects__body">
-    <div class="projects__grid">
-    {projects.map((project, i) => <ProjectCard project={project} locale={locale} demoLabel={t.projects.demo} index={i} />)}
+
+  <div class="projects__actions" data-reveal>
+    <button class="btn btn--solid" type="button" data-open-harbor>
+      {t.projects.enter} <span aria-hidden="true">→</span>
+    </button>
     <a class="projects__all" href={`${profile.github.url}?tab=repositories`} target="_blank" rel="noopener">
       {format(t.projects.all, { count: repoCount })}
     </a>
-    </div>
   </div>
+
+  <ul class="fleet">
+    {
+      projects.map((project, i) => {
+        const m = moorings[i % moorings.length]!;
+        return (
+          <li
+            class:list={['moored', { 'moored--featured': project.featured }]}
+            style={`--x: ${m.x}; --y: ${m.y}; --s: ${m.scale}; --i: ${i}`}
+          >
+            <button
+              class="moored__boat"
+              type="button"
+              data-open-harbor={project.slug}
+              aria-describedby={`barco-${project.slug}`}
+            >
+              <Boat lit={project.featured} />
+              <span class="moored__name">{project.name}</span>
+            </button>
+            <div class="moored__preview" id={`barco-${project.slug}`} role="tooltip">
+              <img
+                src={project.image.src}
+                width={project.image.width}
+                height={project.image.height}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+              <p class="moored__title">{project.name}</p>
+              <p class="moored__desc">{pick(project.description, locale)}</p>
+              <p class="moored__tech">{techOf(project, locale).slice(0, 3).join(' · ')}</p>
+            </div>
+          </li>
+        );
+      })
+    }
+  </ul>
 </section>
 
 <style>
-  /* O grid responde ao espaço do próprio bloco (container query), não à tela. */
-  /* Centrada quando cabe na tela; quando não cabe (stage estreito), cresce a partir do topo. */
-  @media (--stage) {
-    .projects.section--tall {
-      justify-content: safe center;
-    }
-  }
-  /* O bloco termina antes da torre (os cards são opacos e cobririam o farol). */
-  .projects__body {
-    container: projects / inline-size;
-    width: min(100%, var(--clear-of-lighthouse));
-  }
-  .projects__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-s) var(--space-m);
-    align-items: start;
+  .projects__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-m) var(--space-l);
   }
   .projects__all {
-    align-self: center;
     padding: var(--space-xs) var(--space-2xs);
     font: 400 var(--text-mono) var(--font-mono);
     color: var(--luz);
     text-underline-offset: 4px;
   }
-  @container projects (min-width: 34rem) {
-    .projects__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+  .fleet {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .moored {
+    position: relative;
+  }
+  .moored__boat {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  .moored__preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: calc(var(--radius-card) - 6px);
+    background: var(--noite-funda);
+  }
+  .moored__preview p {
+    margin: 0;
+  }
+  .moored__title {
+    font-weight: 600;
+  }
+  .moored__desc {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    font-size: var(--text-small);
+    line-height: 1.45;
+    color: var(--nevoa);
+  }
+  .moored__tech {
+    font: 400 var(--text-label) / 1.5 var(--font-mono);
+    color: var(--luz);
+  }
+
+  /* ---------- Fluxo (celular): carrossel de cartões ---------- */
+  @media not all and (--stage) {
+    .fleet {
+      display: flex;
+      gap: var(--space-m);
+      margin-inline: calc(-1 * var(--space-l));
+      padding: var(--space-2xs) var(--space-l) var(--space-s);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--space-l);
+      scrollbar-width: none;
+    }
+    .moored {
+      flex: 0 0 min(16.25rem, 78%);
+      scroll-snap-align: start;
+    }
+    /* o botão cobre o cartão todo; barco e nome ficam só para leitores de tela */
+    .moored__boat {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: var(--radius-card);
+    }
+    .moored__boat :global(.boat),
+    .moored__name {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    .moored__preview {
+      display: grid;
+      gap: var(--space-2xs);
+      height: 100%;
+      padding: 0 0 var(--space-m);
+      overflow: hidden;
+      border: 1px solid var(--nevoa-linha);
+      border-radius: var(--radius-card);
+      background: var(--painel-forte);
+    }
+    .moored--featured .moored__preview {
+      border-color: var(--luz-media);
+    }
+    .moored__preview img {
+      border-radius: 0;
+      margin-bottom: var(--space-xs);
+    }
+    .moored__title,
+    .moored__tech {
+      padding-inline: var(--space-m);
+    }
+    .moored__desc {
+      display: none;
+    }
+    .moored__boat:focus-visible + .moored__preview {
+      border-color: var(--luz);
+    }
+  }
+
+  /* ---------- Stage: barcos ancorados no mar, prévia no hover ---------- */
+  @media (--stage) {
+    .projects {
+      justify-content: flex-start;
+    }
+    .fleet {
+      position: absolute;
+      inset: 0;
+      max-width: none;
+      pointer-events: none;
+    }
+    .moored {
+      /* --scene-u já é um comprimento: 40 unidades da cena × profundidade */
+      --boat-w: calc(40 * var(--s) * var(--scene-u));
+      position: absolute;
+      /* faixa livre entre a margem e o farol; y abaixo do horizonte */
+      left: calc(var(--gutter) + var(--x) * (var(--clear-of-lighthouse) - var(--boat-w) - 3rem));
+      top: calc(var(--horizon) + var(--y) * var(--scene-u));
+      z-index: calc(1 + var(--i));
+      pointer-events: auto;
+    }
+    .moored:hover,
+    .moored:focus-within {
+      z-index: 20;
+    }
+    .moored__boat {
+      display: grid;
+      justify-items: center;
+      gap: var(--space-2xs);
+      padding: var(--space-2xs);
+      border-radius: var(--radius-card);
+    }
+    .moored__boat :global(.boat) {
+      width: var(--boat-w);
+    }
+    .moored__name {
+      font-size: calc(0.75rem + 0.12rem * var(--s));
+      font-weight: 600;
+      white-space: nowrap;
+      text-shadow: 0 1px 10px var(--sombra-texto);
+      transition: color var(--dur-fast);
+    }
+    /* luz do barco em destaque refletida na água */
+    .moored--featured::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: calc(var(--boat-w) * 0.7);
+      width: calc(var(--boat-w) * 2.4);
+      height: calc(var(--boat-w) * 0.22);
+      translate: -50% 0;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, color-mix(in oklch, var(--luz) 45%, transparent), transparent);
+      pointer-events: none;
+    }
+    .moored--featured .moored__name,
+    .moored:hover .moored__name,
+    .moored__boat:focus-visible .moored__name {
+      color: var(--luz);
+    }
+    .moored__preview {
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + var(--space-s));
+      display: grid;
+      gap: var(--space-2xs);
+      width: 18.75rem;
+      padding: var(--space-s) var(--space-s) var(--space-m);
+      border: 1px solid var(--luz-media);
+      border-radius: var(--radius-card);
+      background: color-mix(in oklch, var(--noite) 94%, transparent);
+      box-shadow:
+        0 12px 32px rgb(0 0 0 / 0.4),
+        0 0 24px var(--luz-sutil);
+      opacity: 0;
+      visibility: hidden;
+      translate: -50% var(--space-xs);
+      pointer-events: none;
+      transition:
+        opacity var(--dur-fast) var(--ease-out),
+        translate var(--dur-fast) var(--ease-out),
+        visibility var(--dur-fast);
+    }
+    .moored__preview img {
+      margin-bottom: var(--space-xs);
+    }
+    .moored__preview > p {
+      padding-inline: var(--space-2xs);
+    }
+    .moored:hover .moored__preview,
+    .moored:focus-within .moored__preview {
+      opacity: 1;
+      visibility: visible;
+      translate: -50% 0;
     }
   }
 </style>
