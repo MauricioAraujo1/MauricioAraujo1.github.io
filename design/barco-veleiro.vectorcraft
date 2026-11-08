@@ -126,7 +126,7 @@
             {
               "id": 3,
               "name": "estai-de-popa",
-              "opacity": 0.7,
+              "opacity": 0.35,
               "appearance": {
                 "items": [
                   {
@@ -141,9 +141,9 @@
                       "type": "solid",
                       "color": {
                         "model": "rgb",
-                        "r": 0.54901963,
-                        "g": 0.59607846,
-                        "b": 0.76862746
+                        "r": 0.9372549,
+                        "g": 0.9019608,
+                        "b": 0.8235294
                       }
                     },
                     "width": 0.8
@@ -178,7 +178,7 @@
             {
               "id": 4,
               "name": "estai-de-proa",
-              "opacity": 0.7,
+              "opacity": 0.35,
               "appearance": {
                 "items": [
                   {
@@ -193,9 +193,9 @@
                       "type": "solid",
                       "color": {
                         "model": "rgb",
-                        "r": 0.54901963,
-                        "g": 0.59607846,
-                        "b": 0.76862746
+                        "r": 0.9372549,
+                        "g": 0.9019608,
+                        "b": 0.8235294
                       }
                     },
                     "width": 0.8
@@ -230,40 +230,19 @@
             {
               "id": 5,
               "name": "genoa",
+              "opacity": 0.7,
               "appearance": {
                 "items": [
                   {
                     "kind": "fill",
                     "paint": {
-                      "type": "gradient",
-                      "gradient": {
-                        "kind": "Linear",
-                        "stops": [
-                          {
-                            "offset": 0.0,
-                            "color": {
-                              "model": "rgb",
-                              "r": 0.8392157,
-                              "g": 0.8,
-                              "b": 0.7058824
-                            },
-                            "opacity": 1.0,
-                            "midpoint": 0.5
-                          },
-                          {
-                            "offset": 1.0,
-                            "color": {
-                              "model": "rgb",
-                              "r": 0.9372549,
-                              "g": 0.9019608,
-                              "b": 0.8235294
-                            },
-                            "opacity": 1.0,
-                            "midpoint": 0.5
-                          }
-                        ]
-                      },
-                      "angle": 0.0
+                      "type": "solid",
+                      "color": {
+                        "model": "rgb",
+                        "r": 0.9372549,
+                        "g": 0.9019608,
+                        "b": 0.8235294
+                      }
                     }
                   },
                   {
@@ -330,35 +309,13 @@
                   {
                     "kind": "fill",
                     "paint": {
-                      "type": "gradient",
-                      "gradient": {
-                        "kind": "Linear",
-                        "stops": [
-                          {
-                            "offset": 0.0,
-                            "color": {
-                              "model": "rgb",
-                              "r": 0.95686275,
-                              "g": 0.9254902,
-                              "b": 0.85490197
-                            },
-                            "opacity": 1.0,
-                            "midpoint": 0.5
-                          },
-                          {
-                            "offset": 1.0,
-                            "color": {
-                              "model": "rgb",
-                              "r": 0.79607844,
-                              "g": 0.7529412,
-                              "b": 0.65882355
-                            },
-                            "opacity": 1.0,
-                            "midpoint": 0.5
-                          }
-                        ]
-                      },
-                      "angle": 0.0
+                      "type": "solid",
+                      "color": {
+                        "model": "rgb",
+                        "r": 0.9372549,
+                        "g": 0.9019608,
+                        "b": 0.8235294
+                      }
                     }
                   },
                   {
@@ -412,7 +369,7 @@
             {
               "id": 7,
               "name": "talas",
-              "opacity": 0.8,
+              "opacity": 0.0,
               "appearance": {
                 "items": [
                   {
@@ -506,9 +463,9 @@
                       "type": "solid",
                       "color": {
                         "model": "rgb",
-                        "r": 0.9019608,
-                        "g": 0.87058824,
-                        "b": 0.80784315
+                        "r": 0.9372549,
+                        "g": 0.9019608,
+                        "b": 0.8235294
                       }
                     }
                   },
@@ -594,9 +551,9 @@
                       "type": "solid",
                       "color": {
                         "model": "rgb",
-                        "r": 0.8117647,
-                        "g": 0.77254903,
-                        "b": 0.68235296
+                        "r": 0.9372549,
+                        "g": 0.9019608,
+                        "b": 0.8235294
                       }
                     },
                     "width": 2.2,
@@ -632,7 +589,7 @@
             {
               "id": 10,
               "name": "guarda-mancebo",
-              "opacity": 0.85,
+              "opacity": 0.35,
               "appearance": {
                 "items": [
                   {
@@ -647,9 +604,9 @@
                       "type": "solid",
                       "color": {
                         "model": "rgb",
-                        "r": 0.8117647,
-                        "g": 0.77254903,
-                        "b": 0.68235296
+                        "r": 0.9372549,
+                        "g": 0.9019608,
+                        "b": 0.8235294
                       }
                     },
                     "width": 0.8
@@ -851,6 +808,7 @@
             {
               "id": 12,
               "name": "cabine-sombra",
+              "opacity": 0.7,
               "appearance": {
                 "items": [
                   {
@@ -859,9 +817,9 @@
                       "type": "solid",
                       "color": {
                         "model": "rgb",
-                        "r": 0.7882353,
-                        "g": 0.7529412,
-                        "b": 0.6784314
+                        "r": 0.9372549,
+                        "g": 0.9019608,
+                        "b": 0.8235294
                       }
                     }
                   },
@@ -1383,35 +1341,13 @@
                   {
                     "kind": "fill",
                     "paint": {
-                      "type": "gradient",
-                      "gradient": {
-                        "kind": "Linear",
-                        "stops": [
-                          {
-                            "offset": 0.0,
-                            "color": {
-                              "model": "rgb",
-                              "r": 0.8235294,
-                              "g": 0.32156864,
-                              "b": 0.2901961
-                            },
-                            "opacity": 1.0,
-                            "midpoint": 0.5
-                          },
-                          {
-                            "offset": 1.0,
-                            "color": {
-                              "model": "rgb",
-                              "r": 0.56078434,
-                              "g": 0.18431373,
-                              "b": 0.16470589
-                            },
-                            "opacity": 1.0,
-                            "midpoint": 0.5
-                          }
-                        ]
-                      },
-                      "angle": -90.0
+                      "type": "solid",
+                      "color": {
+                        "model": "rgb",
+                        "r": 0.7882353,
+                        "g": 0.27450982,
+                        "b": 0.23921569
+                      }
                     }
                   },
                   {
@@ -1487,6 +1423,7 @@
             {
               "id": 18,
               "name": "linha-dagua",
+              "opacity": 0.0,
               "appearance": {
                 "items": [
                   {
@@ -1574,6 +1511,7 @@
             {
               "id": 19,
               "name": "faixa",
+              "opacity": 0.0,
               "appearance": {
                 "items": [
                   {
@@ -1634,7 +1572,7 @@
             {
               "id": 20,
               "name": "borda",
-              "opacity": 0.85,
+              "opacity": 0.0,
               "appearance": {
                 "items": [
                   {
@@ -1861,6 +1799,94 @@
                     1.0,
                     117.8,
                     9.0
+                  ]
+                }
+              }
+            },
+            {
+              "id": 23,
+              "name": "sombra-casco",
+              "opacity": 0.28,
+              "appearance": {
+                "items": [
+                  {
+                    "kind": "fill",
+                    "paint": {
+                      "type": "solid",
+                      "color": {
+                        "model": "rgb",
+                        "r": 0.05490196,
+                        "g": 0.078431375,
+                        "b": 0.1882353
+                      }
+                    }
+                  },
+                  {
+                    "kind": "stroke",
+                    "paint": {
+                      "type": "none"
+                    },
+                    "width": 0.0
+                  }
+                ]
+              },
+              "kind": {
+                "type": "path",
+                "path": {
+                  "subpaths": [
+                    {
+                      "anchors": [
+                        {
+                          "p": [
+                            30.0,
+                            110.0
+                          ],
+                          "in": [
+                            34.0,
+                            116.0
+                          ],
+                          "out": [
+                            70.0,
+                            120.0
+                          ]
+                        },
+                        {
+                          "p": [
+                            206.5,
+                            113.0
+                          ],
+                          "in": [
+                            180.0,
+                            121.0
+                          ]
+                        },
+                        {
+                          "p": [
+                            203.0,
+                            120.0
+                          ],
+                          "out": [
+                            197.0,
+                            130.0
+                          ]
+                        },
+                        {
+                          "p": [
+                            48.0,
+                            127.0
+                          ],
+                          "in": [
+                            64.0,
+                            133.0
+                          ],
+                          "out": [
+                            40.0,
+                            122.0
+                          ]
+                        }
+                      ],
+                      "closed": true
+                    }
                   ]
                 }
               }
@@ -2801,7 +2827,7 @@
     },
     "raster_effects_ppi": 72.0,
     "images": {},
-    "next_id": 23,
+    "next_id": 24,
     "metadata": {
       "author": "",
       "authorTitle": "",
