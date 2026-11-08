@@ -54,16 +54,17 @@ const reflection = `barco-reflexo-${Math.random().toString(36).slice(2, 8)}`;
     flex: none;
     overflow: visible;
   }
-  /* o casco balança; o reflexo fica na água */
+  /* o casco balança; o reflexo fica na água. Cada barco (--i do ancoradouro) tem o
+     próprio ritmo e começa num ponto diferente da onda, para não balançarem juntos. */
   .boat__hull {
     transform-box: view-box;
     transform-origin: 115px 125px;
-    animation: marola 4.5s var(--ease-in-out) infinite;
+    animation: marola calc(3.4s + var(--i, 0) * 0.75s) var(--ease-in-out) calc(var(--i, 0) * -1.7s) infinite;
   }
   .boat__light {
     opacity: 0.6;
     filter: drop-shadow(0 0 4px var(--luz));
-    animation: pulso 3s var(--ease-in-out) infinite;
+    animation: pulso 3s var(--ease-in-out) calc(var(--i, 0) * -0.8s) infinite;
     transition: opacity var(--dur-base);
   }
   .boat__portholes {
@@ -91,9 +92,16 @@ const reflection = `barco-reflexo-${Math.random().toString(36).slice(2, 8)}`;
       animation: none;
     }
   }
+  /* sobe e desce com a onda, adernando para um lado e depois para o outro */
   @keyframes marola {
+    25% {
+      transform: translateY(2.5px) rotate(-3.5deg);
+    }
     50% {
-      transform: translateY(1.5px) rotate(-1.5deg);
+      transform: translateY(5px) rotate(0.5deg);
+    }
+    75% {
+      transform: translateY(2px) rotate(3deg);
     }
   }
   @keyframes pulso {
