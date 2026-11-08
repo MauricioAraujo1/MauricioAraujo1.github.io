@@ -213,6 +213,21 @@ const t = useTranslations(locale);
     .moored:focus-within {
       z-index: 20;
     }
+    /* O mar fica parado atrás e a seção rola por cima: sem isto, ao sair do passo os
+       barcos subiriam para o céu. Cada um some até o casco chegar ao horizonte. */
+    @supports (animation-timeline: view()) {
+      .projects {
+        view-timeline: --porto block;
+      }
+      .moored {
+        animation: afundar linear both;
+        animation-range: exit 0px exit calc(var(--y) * var(--scene-u) + var(--boat-w) * 0.6);
+      }
+      /* regra à parte: o minificador junta timeline no atalho `animation`, que o Chrome rejeita */
+      .fleet .moored {
+        animation-timeline: --porto;
+      }
+    }
     .moored__boat {
       display: grid;
       justify-items: center;
@@ -282,6 +297,12 @@ const t = useTranslations(locale);
       opacity: 1;
       visibility: visible;
       translate: -50% 0;
+    }
+  }
+  @keyframes afundar {
+    to {
+      opacity: 0;
+      visibility: hidden;
     }
   }
 </style>
