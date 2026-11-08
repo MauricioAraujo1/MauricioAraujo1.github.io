@@ -60,7 +60,7 @@ const dictionary = {
       weeks: 'últimas 52 semanas',
       less: 'menos',
       more: 'mais',
-      day: '{count} contribuições em {date}',
+      day: { one: '{count} contribuição em {date}', other: '{count} contribuições em {date}' },
     },
     journey: {
       title: 'Trajetória',
@@ -122,7 +122,7 @@ const dictionary = {
       weeks: 'last 52 weeks',
       less: 'less',
       more: 'more',
-      day: '{count} contributions on {date}',
+      day: { one: '{count} contribution on {date}', other: '{count} contributions on {date}' },
     },
     journey: {
       title: 'Journey',
@@ -146,6 +146,14 @@ export type Dictionary = (typeof dictionary)[Locale];
 
 export function useTranslations(locale: Locale): Dictionary {
   return dictionary[locale];
+}
+
+/** Formas no singular e no plural de um texto que depende de uma contagem. */
+export type Plural = { one: string; other: string };
+
+/** Escolhe a forma pela contagem: 1 é singular; 0 e o resto ficam no plural (pt e en). */
+export function plural(forms: Plural, count: number): string {
+  return count === 1 ? forms.one : forms.other;
 }
 
 /** Troca {chave} por valores: format('ver {count}', { count: 5 }). */
