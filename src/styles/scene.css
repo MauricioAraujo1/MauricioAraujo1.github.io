@@ -1,5 +1,5 @@
 /*
- * Cena e animações. O estado vem do <html> (definido pelos scripts):
+ * Cena e animações. O estado vem do <html>, e as variáveis por quadro vêm de .scene (definidos pelos scripts):
  *   data-beacon="on|off"   farol aceso ou apagado
  *   data-section="<id>"    seção visível
  *   data-lamp="on|off"     lâmpada no Morse (contato)

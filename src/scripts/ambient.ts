@@ -6,6 +6,8 @@ import { scene } from '@/components/scene/geometry';
 import { prefersReducedMotion, random } from './motion';
 
 const root = document.documentElement;
+/** O parallax muda a cada rolagem: a variável fica na cena para não recalcular a página inteira. */
+const sceneEl = document.querySelector<HTMLElement>('[data-scene]') ?? root;
 
 export function initAmbient(): void {
   if (prefersReducedMotion()) return;
@@ -18,7 +20,7 @@ function initParallax(): void {
   let ticking = false;
   const update = () => {
     const max = document.documentElement.scrollHeight - window.innerHeight;
-    root.style.setProperty('--progress', String(max > 0 ? window.scrollY / max : 0));
+    sceneEl.style.setProperty('--progress', String(max > 0 ? window.scrollY / max : 0));
     ticking = false;
   };
   window.addEventListener(
