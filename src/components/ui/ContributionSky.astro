@@ -65,13 +65,13 @@ const height = TOP + 7 * CELL;
                 cx={col * CELL + CELL / 2}
                 cy={TOP + row * CELL + CELL / 2}
                 r={radius[day.level]}
-              >
-                <title>{format(plural(labels.day, day.count), { count: day.count, date: dateFmt.format(asDate(day.date)) })}</title>
-              </circle>
+                data-tip={format(plural(labels.day, day.count), { count: day.count, date: dateFmt.format(asDate(day.date)) })}
+              />
             );
           }),
         )}
       </svg>
+      <p class="sky__tip" aria-hidden="true" hidden />
     </figure>
   )
 }
@@ -79,6 +79,7 @@ const height = TOP + 7 * CELL;
 <style>
   /* painel discreto: separa o céu de estrelas das montanhas e do horizonte atrás */
   .sky {
+    position: relative;
     margin: 0;
     width: min(100%, 45rem, var(--clear-of-lighthouse));
     padding: var(--space-m) var(--space-m) var(--space-s);
@@ -137,6 +138,11 @@ const height = TOP + 7 * CELL;
   .sky.is-visible .sky__star {
     /* varredura coluna a coluna, limitada a ~1,8 s no total */
     --sweep: calc(var(--c) * 35ms);
+    animation: acender var(--dur-entrance) var(--ease-out) forwards;
+    animation-delay: var(--sweep);
+  }
+  /* só os dias com commits cintilam: menos animações simultâneas para o navegador */
+  .sky.is-visible .sky__star:not(.lv0) {
     animation:
       acender var(--dur-entrance) var(--ease-out) forwards,
       cintilar 5s var(--ease-in-out) infinite;
@@ -170,6 +176,22 @@ const height = TOP + 7 * CELL;
       transform: scale(1.8);
     }
   }
+  /* uma única dica para o céu todo, posicionada sobre a estrela apontada */
+  .sky__tip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 0;
+    padding: var(--space-2xs) var(--space-xs);
+    border: 1px solid var(--nevoa-linha);
+    border-radius: var(--radius-pill);
+    background: var(--noite-funda);
+    font: 400 var(--text-label) var(--font-mono);
+    color: var(--farol-creme);
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translate(-50%, calc(-100% - var(--space-xs)));
+  }
   @keyframes acender {
     from {
       opacity: 0;
@@ -195,3 +217,22 @@ const height = TOP + 7 * CELL;
     }
   }
 </style>
+
+<script>
+  // Dica compartilhada: uma por céu, em vez de um <title> por estrela.
+  document.querySelectorAll<HTMLElement>('.sky').forEach((sky) => {
+    const tip = sky.querySelector<HTMLElement>('.sky__tip');
+    if (!tip) return;
+    sky.addEventListener('pointerover', (e) => {
+      const star = (e.target as Element).closest<SVGElement>('[data-tip]');
+      if (!star) return;
+      const box = sky.getBoundingClientRect();
+      const dot = star.getBoundingClientRect();
+      tip.textContent = star.dataset.tip ?? '';
+      tip.style.left = `${dot.left + dot.width / 2 - box.left}px`;
+      tip.style.top = `${dot.top - box.top}px`;
+      tip.hidden = false;
+    });
+    sky.addEventListener('pointerleave', () => (tip.hidden = true));
+  });
+</script>
