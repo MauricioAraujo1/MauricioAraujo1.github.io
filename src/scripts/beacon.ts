@@ -18,6 +18,8 @@ const DRIFT_DEG_PER_S = 0.6;
 const DRIFT_MAX_DEG = 6;
 
 const root = document.documentElement;
+/** Variáveis que mudam a cada quadro ficam na cena: escritas no <html>, recalculariam o estilo da página inteira. */
+const sceneEl = document.querySelector<HTMLElement>('[data-scene]') ?? root;
 
 export function initBeacon(): void {
   const lens = createLens();
@@ -68,7 +70,7 @@ export async function lightBeacon(): Promise<void> {
 }
 
 /**
- * A lente: guarda o ângulo acumulado (em graus náuticos) e escreve --beam-rot.
+ * A lente: guarda o ângulo acumulado (em graus náuticos) e escreve --beam-rot na cena.
  * Giros entre rumos usam transição CSS; a deriva é feita frame a frame.
  */
 function createLens() {
@@ -79,7 +81,7 @@ function createLens() {
   let driftFrame = 0;
   let turnTimer = 0;
 
-  const write = () => root.style.setProperty('--beam-rot', `${beamRotation(angle)}deg`);
+  const write = () => sceneEl.style.setProperty('--beam-rot', `${beamRotation(angle)}deg`);
 
   write();
 
@@ -116,7 +118,7 @@ function createLens() {
       if (prefersReducedMotion()) return write();
 
       const duration = Math.max(TURN_MIN_MS, (delta / TURN_DEG_PER_S) * 1000);
-      root.style.setProperty('--beam-turn', `${duration}ms`);
+      sceneEl.style.setProperty('--beam-turn', `${duration}ms`);
       root.dataset.beam = 'turning';
       write();
       turnTimer = window.setTimeout(() => {
