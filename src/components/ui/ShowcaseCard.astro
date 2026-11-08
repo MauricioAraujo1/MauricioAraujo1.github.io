@@ -1,0 +1,123 @@
+---
+/** Um projeto na vitrine do porto: imagem 16:9, nome, stack e links. */
+import { techOf, type Project } from '@/data/projects';
+import { useTranslations, type Locale } from '@/i18n/ui';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+}
+const { project, locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<article class:list={['showcase', { 'showcase--featured': project.featured }]} id={`porto-${project.slug}`}>
+  <img
+    class="showcase__image"
+    src={project.image.src}
+    width={project.image.width}
+    height={project.image.height}
+    alt=""
+    loading="lazy"
+    decoding="async"
+  />
+  <div class="showcase__foot">
+    <div class="showcase__text">
+      <h3 class="showcase__name">{project.name}</h3>
+      <p class="showcase__tech">{techOf(project, locale).join(' · ')}</p>
+    </div>
+    <p class="showcase__links">
+      {
+        project.demo && (
+          <a class="showcase__live" href={project.demo} target="_blank" rel="noopener">
+            {t.harbor.live} ↗
+          </a>
+        )
+      }
+      <a href={project.url} target="_blank" rel="noopener">
+        {t.harbor.code} ↗
+      </a>
+    </p>
+  </div>
+</article>
+
+<style>
+  .showcase {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--nevoa-linha);
+    border-radius: var(--radius-card);
+    background: var(--painel-forte);
+    transition:
+      border-color var(--dur-base),
+      box-shadow var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+  }
+  .showcase--featured {
+    border-color: var(--luz-media);
+    box-shadow: 0 0 28px var(--luz-sutil);
+  }
+  .showcase:focus-within,
+  .showcase:target {
+    border-color: var(--luz);
+  }
+  .showcase__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background: var(--noite-funda);
+  }
+  /* texto à esquerda, links empilhados à direita */
+  .showcase__foot {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: var(--space-m);
+    padding: var(--space-m) var(--space-l) var(--space-l);
+  }
+  .showcase__text {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+  .showcase__name {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .showcase__tech,
+  .showcase__links {
+    margin: 0;
+    font: 400 var(--text-label) / 1.5 var(--font-mono);
+  }
+  .showcase__tech {
+    color: var(--luz);
+  }
+  .showcase__links {
+    display: grid;
+    justify-items: end;
+    padding-top: var(--space-2xs);
+  }
+  .showcase__links a {
+    padding-block: var(--space-2xs);
+    color: var(--nevoa);
+    text-decoration: none;
+  }
+  .showcase__links .showcase__live {
+    color: var(--luz);
+    font-weight: 500;
+  }
+  @media (--hover) {
+    .showcase:hover {
+      border-color: var(--luz-media);
+      box-shadow: 0 0 32px color-mix(in oklch, var(--luz) 12%, transparent);
+      transform: translateY(-3px);
+    }
+    .showcase__links a:hover {
+      color: var(--luz);
+    }
+  }
+</style>
