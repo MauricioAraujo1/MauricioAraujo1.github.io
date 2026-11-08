@@ -23,6 +23,9 @@ const AIM_MIN_MS = 450;
 /** Folga ao sair de um barco, para não voltar ao rumo entre um barco e outro. */
 const RELEASE_DELAY_MS = 220;
 /** O eixo do feixe desenhado (lanterna 1120,276 → −40,240) sobe ~1,8° acima do rumo de repouso. */
+/** Comprimento do feixe desenhado e o ponto dele (unidades da cena) que ilumina bem o casco. */
+const BEAM_LENGTH = 1160;
+const BEAM_BRIGHT_REACH = 480;
 const BEAM_AXIS_TILT_DEG = (Math.atan2(36, 1160) * 180) / Math.PI;
 
 const root = document.documentElement;
@@ -70,13 +73,17 @@ function followBoats(lens: ReturnType<typeof createLens>): void {
   let releaseTimer = 0;
   let aimed = false;
 
-  const bearingTo = (boat: Element) => {
+  /** Rumo da lanterna até o casco e quanto esticar o feixe para chegar nele ainda forte. */
+  const aimAt = (boat: Element) => {
     const from = lamp.getBoundingClientRect();
     const to = boat.getBoundingClientRect();
     const dx = to.left + to.width / 2 - (from.left + from.width / 2);
     // mira no casco, não no topo do mastro
     const dy = to.top + to.height * 0.75 - (from.top + from.height / 2);
-    return ((Math.atan2(dx, -dy) * 180) / Math.PI - BEAM_AXIS_TILT_DEG + 360) % 360;
+    const bearing = ((Math.atan2(dx, -dy) * 180) / Math.PI - BEAM_AXIS_TILT_DEG + 360) % 360;
+    // a lâmpada tem 16 unidades de diâmetro: dá a escala da cena na tela
+    const distance = Math.hypot(dx, dy) / (from.width / 16);
+    return { bearing, reach: Math.min(BEAM_LENGTH / BEAM_BRIGHT_REACH, Math.max(1, distance / BEAM_BRIGHT_REACH)) };
   };
 
   document.querySelectorAll<HTMLElement>('.moored').forEach((moored) => {
@@ -86,7 +93,8 @@ function followBoats(lens: ReturnType<typeof createLens>): void {
       if (!stage.matches || root.dataset.section !== 'projects') return;
       clearTimeout(releaseTimer);
       aimed = true;
-      lens.aim(bearingTo(boat));
+      const { bearing, reach } = aimAt(boat);
+      lens.aim(bearing, reach);
     };
     const release = () => {
       if (!aimed) return;
@@ -139,7 +147,11 @@ function createLens() {
   let driftFrame = 0;
   let turnTimer = 0;
 
-  const write = () => sceneEl.style.setProperty('--beam-rot', `${beamRotation(angle)}deg`);
+  let reach = 1;
+  const write = () => {
+    sceneEl.style.setProperty('--beam-rot', `${beamRotation(angle)}deg`);
+    sceneEl.style.setProperty('--beam-reach', String(reach));
+  };
 
   write();
 
@@ -194,15 +206,17 @@ function createLens() {
       target = angle + delta;
       swing(delta, Math.max(TURN_MIN_MS, (delta / TURN_DEG_PER_S) * 1000), drift);
     },
-    /** Aponta o feixe para um rumo e segura ali. */
-    aim(bearing: number) {
+    /** Aponta o feixe para um rumo, esticado `length` vezes, e segura ali. */
+    aim(bearing: number, length = 1) {
       stop();
+      reach = length;
       const delta = shortest(bearing);
       swing(delta, aimDuration(delta));
     },
     /** Solta a mira: volta ao rumo da seção e retoma a deriva. */
     release() {
       stop();
+      reach = 1;
       const delta = shortest(target);
       target = angle + delta;
       swing(delta, aimDuration(delta), drift);
