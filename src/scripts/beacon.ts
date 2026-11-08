@@ -22,11 +22,15 @@ const AIM_DEG_PER_S = 90;
 const AIM_MIN_MS = 450;
 /** Folga ao sair de um barco, para não voltar ao destaque entre um barco e outro. */
 const RELEASE_DELAY_MS = 220;
-/** O eixo do feixe desenhado (lanterna 1120,276 → −40,240) sobe ~1,8° acima do rumo de repouso. */
-/** Comprimento do feixe desenhado e o ponto dele (unidades da cena) que ilumina bem o casco. */
+/** Comprimento do feixe desenhado (unidades da cena): ao mirar, ele muda para terminar no casco. */
 const BEAM_LENGTH = 1160;
-const BEAM_BRIGHT_REACH = 480;
-const BEAM_AXIS_TILT_DEG = (Math.atan2(36, 1160) * 180) / Math.PI;
+/** A ponta do feixe desenhado fica 36 unidades acima da lanterna (1120,276 → −40,240) e tem 240 de abertura. */
+const BEAM_TIP_RISE = 36;
+const BEAM_MOUTH = 240;
+/** Ao mirar, a boca do feixe tem a largura do barco. */
+const BEAM_MOUTH_PER_BOAT = 1;
+/** O casco fica neste ponto do feixe; o resto é o esmaecer da ponta (degradê em farol-cena.svg). */
+const BEAM_HULL_AT = 0.96;
 
 const root = document.documentElement;
 /** Variáveis que mudam a cada quadro ficam na cena: escritas no <html>, recalculariam o estilo da página inteira. */
@@ -75,7 +79,7 @@ function followBoats(lens: ReturnType<typeof createLens>): { rest: () => boolean
   let releaseTimer = 0;
 
   /**
-   * Rumo da lanterna até o casco e quanto esticar o feixe para chegar nele ainda forte.
+   * Rumo da lanterna até o casco e a escala do feixe: comprimento até ele, abertura do tamanho dele.
    * O barco é medido em relação à seção (a cena fica parada): vale mesmo no meio da rolagem.
    */
   const aimAt = (boat: Element) => {
@@ -85,15 +89,22 @@ function followBoats(lens: ReturnType<typeof createLens>): { rest: () => boolean
     const dx = to.left + to.width / 2 - (from.left + from.width / 2);
     // mira no casco, não no topo do mastro
     const dy = to.top - sectionTop + to.height * 0.75 - (from.top + from.height / 2);
-    const bearing = ((Math.atan2(dx, -dy) * 180) / Math.PI - BEAM_AXIS_TILT_DEG + 360) % 360;
     // a lâmpada tem 16 unidades de diâmetro: dá a escala da cena na tela
-    const distance = Math.hypot(dx, dy) / (from.width / 16);
-    return { bearing, reach: Math.min(BEAM_LENGTH / BEAM_BRIGHT_REACH, Math.max(1, distance / BEAM_BRIGHT_REACH)) };
+    const unit = from.width / 16;
+    const distance = Math.hypot(dx, dy) / unit;
+    const spread = Math.min(1, ((to.width / unit) * BEAM_MOUTH_PER_BOAT) / BEAM_MOUTH);
+    // comprimento e abertura mudam separados, então o ângulo da ponta (subida/comprimento)
+    // muda junto e entra na correção do rumo
+    const rise = BEAM_TIP_RISE * spread * BEAM_HULL_AT; // subida do eixo até o casco
+    const run = Math.sqrt(Math.max(distance ** 2 - rise ** 2, 1));
+    const tilt = (Math.atan2(rise, run) * 180) / Math.PI;
+    const bearing = ((Math.atan2(dx, -dy) * 180) / Math.PI - tilt + 360) % 360;
+    return { bearing, reach: run / BEAM_HULL_AT / BEAM_LENGTH, spread };
   };
 
   const aimAtBoat = (boat: Element) => {
-    const { bearing, reach } = aimAt(boat);
-    lens.aim(bearing, reach);
+    const { bearing, reach, spread } = aimAt(boat);
+    lens.aim(bearing, reach, spread);
   };
 
   /** Feixe no barco em destaque. Falso quando não se aplica (celular, sem barcos). */
@@ -163,9 +174,11 @@ function createLens() {
   let turnTimer = 0;
 
   let reach = 1;
+  let spread = 1;
   const write = () => {
     sceneEl.style.setProperty('--beam-rot', `${beamRotation(angle)}deg`);
     sceneEl.style.setProperty('--beam-reach', String(reach));
+    sceneEl.style.setProperty('--beam-spread', String(spread));
   };
 
   write();
@@ -212,6 +225,8 @@ function createLens() {
     turnTo(bearing: number) {
       stop();
       reach = 1;
+      spread = 1;
+      delete root.dataset.beamAim;
       const delta = clockwiseDelta(angle, bearing);
       // o rumo ficou só um pouco para trás por causa da deriva: já estamos nele
       const behind = 360 - delta;
@@ -222,10 +237,13 @@ function createLens() {
       target = angle + delta;
       swing(delta, Math.max(TURN_MIN_MS, (delta / TURN_DEG_PER_S) * 1000), drift);
     },
-    /** Aponta o feixe para um rumo, esticado `length` vezes, e segura ali. */
-    aim(bearing: number, length = 1) {
+    /** Aponta o feixe para um rumo, com `length` × o comprimento e `width` × a abertura desenhados, e segura ali. */
+    aim(bearing: number, length = 1, width = 1) {
       stop();
       reach = length;
+      spread = width;
+      // a ponta do feixe é o barco: o degradê não pode sumir antes dela (scene.css)
+      root.dataset.beamAim = '';
       const delta = shortest(bearing);
       swing(delta, aimDuration(delta));
     },
