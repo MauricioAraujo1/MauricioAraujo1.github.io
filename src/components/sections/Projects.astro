@@ -14,21 +14,30 @@ const { locale, repoCount } = Astro.props;
 const t = useTranslations(locale);
 ---
 
-<section id="projects" class="section projects" data-section="projects" data-bearing={bearingOf('projects')}>
+<section id="projects" class="section section--tall projects" data-section="projects" data-bearing={bearingOf('projects')}>
   <SectionHeader section="projects" title={t.projects.title} description={t.projects.description} />
-  <div class="projects__grid">
+  <div class="projects__body">
+    <div class="projects__grid">
     {projects.map((project, i) => <ProjectCard project={project} locale={locale} demoLabel={t.projects.demo} index={i} />)}
     <a class="projects__all" href={`${profile.github.url}?tab=repositories`} target="_blank" rel="noopener">
       {format(t.projects.all, { count: repoCount })}
     </a>
+    </div>
   </div>
 </section>
 
 <style>
   /* O grid responde ao espaço do próprio bloco (container query), não à tela. */
-  .projects {
+  /* Centrada quando cabe na tela; quando não cabe (stage estreito), cresce a partir do topo. */
+  @media (--stage) {
+    .projects.section--tall {
+      justify-content: safe center;
+    }
+  }
+  /* O bloco termina antes da torre (os cards são opacos e cobririam o farol). */
+  .projects__body {
     container: projects / inline-size;
-    width: 100%;
+    width: min(100%, var(--clear-of-lighthouse));
   }
   .projects__grid {
     display: grid;
@@ -43,7 +52,7 @@ const t = useTranslations(locale);
     color: var(--luz);
     text-underline-offset: 4px;
   }
-  @container projects (min-width: 52rem) {
+  @container projects (min-width: 34rem) {
     .projects__grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
