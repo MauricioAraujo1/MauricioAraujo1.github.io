@@ -20,6 +20,9 @@ const dictionary = {
       title: 'Maurício Araújo · Engenheiro de Software Backend',
       description:
         'Portfólio de Maurício Araújo, engenheiro de software backend (Node.js, TypeScript, NestJS) em Manaus.',
+      locale: 'pt_BR',
+      image: '/og/pt.png',
+      imageAlt: 'Maurício Araújo, Engenheiro de Software Backend, ao lado de um farol aceso à noite',
     },
     a11y: { skip: 'Pular para o conteúdo', nav: 'Seções', menu: 'Abrir menu', close: 'Fechar menu' },
     nav: {
@@ -83,6 +86,9 @@ const dictionary = {
       title: 'Maurício Araújo · Backend Software Engineer',
       description:
         'Portfolio of Maurício Araújo, backend software engineer (Node.js, TypeScript, NestJS) based in Manaus, Brazil.',
+      locale: 'en_US',
+      image: '/og/en.png',
+      imageAlt: 'Maurício Araújo, Backend Software Engineer, next to a lit lighthouse at night',
     },
     a11y: { skip: 'Skip to content', nav: 'Sections', menu: 'Open menu', close: 'Close menu' },
     nav: {
