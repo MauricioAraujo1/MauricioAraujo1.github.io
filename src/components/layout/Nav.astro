@@ -3,6 +3,7 @@ import { getRelativeLocaleUrl } from 'astro:i18n';
 import { profile } from '@/data/profile';
 import { sections } from '@/data/sections';
 import { useTranslations, type Locale } from '@/i18n/ui';
+import SoundToggle from '@/components/ui/SoundToggle.astro';
 
 interface Props {
   locale: Locale;
@@ -30,6 +31,7 @@ const otherLocale: Locale = locale === 'pt' ? 'en' : 'pt';
   </nav>
 
   <div class="nav__tools">
+    <SoundToggle locale={locale} />
     <a class="nav__lang" href={getRelativeLocaleUrl(otherLocale)} hreflang={otherLocale} aria-label={t.lang.label}>
       <strong>{t.lang.current}</strong> / {t.lang.other}
     </a>
@@ -63,6 +65,7 @@ const otherLocale: Locale = locale === 'pt' ? 'en' : 'pt';
   }
   .nav__brand {
     margin-right: auto;
+    white-space: nowrap;
     font: 500 var(--text-mono) var(--font-mono);
     letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -110,10 +113,11 @@ const otherLocale: Locale = locale === 'pt' ? 'en' : 'pt';
   .nav__tools {
     display: flex;
     align-items: center;
-    gap: var(--space-m);
+    gap: var(--space-xs);
   }
   .nav__lang {
     padding: var(--space-xs) var(--space-2xs);
+    white-space: nowrap;
     color: var(--nevoa);
     text-decoration: none;
   }
@@ -165,6 +169,7 @@ const otherLocale: Locale = locale === 'pt' ? 'en' : 'pt';
       font-size: inherit;
     }
     .nav__tools {
+      gap: var(--space-m);
       padding-left: 1.75rem;
       border-left: 1px solid var(--nevoa-linha);
     }
